@@ -25,4 +25,6 @@ class Mysql {
 	}
 }
 
-module.exports = new Mysql()
+const mysqlInstance = new Mysql()
+
+module.exports = mysqlInstance
