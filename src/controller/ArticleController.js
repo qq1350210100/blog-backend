@@ -1,9 +1,7 @@
-const Controller = require('../common/Controller')
+import Controller from '../common/Controller'
 
-class ArticleController extends Controller {
+export default class ArticleController extends Controller {
 	getArticleList = async ctx => {
-		console.log('this,', this)
-
 		const { sort } = ctx.query
 
 		const sql = `
@@ -52,5 +50,3 @@ class ArticleController extends Controller {
 		}
 	}
 }
-
-module.exports = ArticleController

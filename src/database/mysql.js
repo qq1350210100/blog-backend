@@ -1,4 +1,4 @@
-const mysql = require('mysql')
+import mysql from 'mysql'
 
 const config = {
 	host: 'localhost',
@@ -25,6 +25,4 @@ class Mysql {
 	}
 }
 
-const mysqlInstance = new Mysql()
-
-module.exports = mysqlInstance
+export default new Mysql()
