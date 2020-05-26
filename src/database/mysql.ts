@@ -13,9 +13,9 @@ const pool = mysql.createPool(config)
 
 class Mysql {
 	constructor() {}
-	query(sql) {
+	query(sql: string) {
 		return new Promise((resolve, reject) => {
-			pool.query(sql, function (error, results, fields) {
+			pool.query(sql, function (error: any, results: any, fields: any) {
 				if (error) {
 					reject(error)
 				}
@@ -25,4 +25,5 @@ class Mysql {
 	}
 }
 
-export default new Mysql()
+const mysqlDB = new Mysql()
+export default mysqlDB
