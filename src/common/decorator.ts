@@ -1,13 +1,17 @@
+interface ReadonlyMethod {
+	readonly [key: string]: string
+}
+
 /**
  * 请求方法
  */
-export const requestMethod = {
-	"GET":"get",
-	"POST": "post",
-	"PUT": "pust",
-	"DELETE": "delete",
-	"OPTION": "option",
-	"PATCH": "patch"
+export const requestMethod: ReadonlyMethod = {
+	GET: 'get',
+	POST: 'post',
+	PUT: 'pust',
+	DELETE: 'delete',
+	OPTION: 'option',
+	PATCH: 'patch'
 }
 
 /**
@@ -16,49 +20,56 @@ export const requestMethod = {
 export const controllers: object[] = []
 
 /**
- * 给controller添加装饰
- * @param {string} path
+ * controller类装饰器
+ * @param {string} prefix // 请求路径前缀
  */
-export function controller(path = '') {
-	return function (target: any) {
-		// 给controller类添加路由前缀
-		console.log(target)
-		target.prefix = path
-	}
+export const controller = (prefix: string = '') => (target: any) => {
+	target.prefix = prefix
+	// 给controller类添加路由前缀
+	console.log('Controller: ', target)
 }
 
 /**
- * 给controller类的方法添加装饰
+ * controller类方法装饰器
  * url 可选
  * method 请求方法
  * middleware 中间件
  */
 interface Options {
-	url: string 
+	url: string
 	method: string
-	middleware?: Function[]
+	middleware?: AsyncGeneratorFunction[]
 }
 
 export function requestMapping({ url = '', method = '', middleware = [] }: Options) {
-	console.log('66666: ', 66666);
-	return function (target: any, name: string, descriptor: any) {
-		let path: string = ''
-		// 判断有没有定义url
-		if (!url) {
-			// 取方法名作为路径
-			path = `/${name}`
-		} else {
-			// 自己定义的url
-			path = url
-		}
-		// 创建router需要的数据 url，method，middleware（可以没有）,最终执行的方法，装饰器队对象的构造函数
-		const item = {
-			url: path,
-			method: method,
-			middleware: middleware,
+	return (target: any, name: string, descriptor: any) => {
+		// 如果没有传自定义url，默认取方法名作为url
+		if (!url) url = name
+		// 创建router需要的数据 url，method，middleware（非必需），最终执行的方法，装饰器对象的构造函数
+		const controller = {
+			url,
+			method,
+			middleware,
 			handler: target[name],
 			constructor: target.constructor
 		}
-		controllers.push(item)
+		controllers.push(controller)
 	}
 }
+
+/**
+ * url: 请求路径
+ * middleware: 中间件
+ */
+interface RequestDecorator {
+	(url: string, middleware?: any): Function
+}
+
+export const get: RequestDecorator = (url, ...middleware) =>
+	requestMapping({ method: requestMethod.GET, url, middleware })
+
+export const post: RequestDecorator = (url, ...middleware: any) =>
+	requestMapping({ method: requestMethod.POST, url, middleware })
+
+export const put: RequestDecorator = (url, ...middleware: any) =>
+	requestMapping({ method: requestMethod.PUT, url, middleware })

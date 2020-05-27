@@ -1,7 +1,10 @@
-import Controller from '../common/Controller'
+import { controller, get } from '../common/decorator'
+import { mysql } from '../middlewares/mysql'
 
-export default class ArticleController extends Controller {
-	getArticleList = async ctx => {
+@controller('/article')
+export default class ArticleController {
+	@get('/list', mysql)
+	async getArticleList(ctx: any) {
 		const { sort } = ctx.query
 
 		const sql = `
@@ -17,8 +20,8 @@ export default class ArticleController extends Controller {
 		  ${sort ? `where sort = '${sort}'` : ''};
 		`
 
-		const data = await this.mysql.query(sql)
-		const response = data.map(item => {
+		const articleList = await ctx.mysql.query(sql)
+		const response = articleList.map((item: any) => {
 			const { tags } = item
 			const tagsList = tags.split(',')
 			return { ...item, tags: tagsList }
@@ -30,13 +33,14 @@ export default class ArticleController extends Controller {
 		}
 	}
 
-	getArticleContent = async ctx => {
+	@get('/content', mysql)
+	async getArticleContent(ctx: any) {
 		const { articleId } = ctx.query
 		const sql = `
 		  select background_image as backgroundImage, content from article where id = ${articleId};
 		`
 		if (articleId) {
-			const data = await this.mysql.query(sql)
+			const data = await ctx.mysql.query(sql)
 			const payload = data[0]
 			ctx.body = {
 				status: 'OK',
