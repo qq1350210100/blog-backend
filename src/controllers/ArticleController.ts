@@ -7,7 +7,7 @@ export default class ArticleController {
 	async getArticleList(ctx: any) {
 		const { sort } = ctx.query
 
-		const sql:string = `
+		const sql: string = `
 		  select
 		    id               as id,
 		    sort             as sort,
@@ -36,8 +36,11 @@ export default class ArticleController {
 	@get('/content', mysql())
 	async getArticleContent(ctx: any) {
 		const { articleId } = ctx.query
-		const sql:string = `
-		  select background_image as backgroundImage, content from article where id = ${articleId};
+		const sql: string = `
+			select 
+				background_image as backgroundImage, 
+				content 
+				from article where id = ${articleId};
 		`
 		if (articleId) {
 			const data = await ctx.mysql.query(sql)

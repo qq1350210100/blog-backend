@@ -21,4 +21,5 @@ class Mysql {
         });
     }
 }
-export default new Mysql();
+const mysqlDB = new Mysql();
+export default mysqlDB;
