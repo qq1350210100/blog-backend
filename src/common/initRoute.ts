@@ -2,7 +2,7 @@ import { controllers } from './decorator'
 export * from '../controllers/UserController'
 export * from '../controllers/ArticleController'
 
-export const initRoutes = (app: any, router: any) => {
+export default function initRoutes(app: any, router: any) {
 	controllers.forEach((controller: any) => {
 		// 获取每个路由的前缀
 		const {

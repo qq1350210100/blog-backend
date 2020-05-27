@@ -1,3 +1,5 @@
+import bodyParser from 'koa-bodyparser'
+
 interface ReadonlyMethod {
 	readonly [key: string]: string
 }
@@ -62,14 +64,14 @@ export function requestMapping({ url = '', method = '', middleware = [] }: Optio
  * middleware: 中间件
  */
 interface RequestDecorator {
-	(url: string, middleware?: any): Function
+	(url: string, ...middleware: any): Function
 }
 
 export const get: RequestDecorator = (url, ...middleware) =>
 	requestMapping({ method: requestMethod.GET, url, middleware })
 
-export const post: RequestDecorator = (url, ...middleware: any) =>
-	requestMapping({ method: requestMethod.POST, url, middleware })
+export const post: RequestDecorator = (url, ...middleware) =>
+	requestMapping({ method: requestMethod.POST, url, middleware: [bodyParser(), ...middleware] })
 
-export const put: RequestDecorator = (url, ...middleware: any) =>
-	requestMapping({ method: requestMethod.PUT, url, middleware })
+export const put: RequestDecorator = (url, ...middleware) =>
+	requestMapping({ method: requestMethod.PUT, url, middleware: [bodyParser(), ...middleware] })

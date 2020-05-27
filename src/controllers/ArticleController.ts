@@ -3,7 +3,7 @@ import { mysql } from '../middlewares/mysql'
 
 @controller('/article')
 export default class ArticleController {
-	@get('/list', mysql)
+	@get('/list', mysql())
 	async getArticleList(ctx: any) {
 		const { sort } = ctx.query
 
@@ -33,7 +33,7 @@ export default class ArticleController {
 		}
 	}
 
-	@get('/content', mysql)
+	@get('/content', mysql())
 	async getArticleContent(ctx: any) {
 		const { articleId } = ctx.query
 		const sql = `
