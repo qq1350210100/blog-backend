@@ -8,9 +8,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const decorator_1 = require("../common/decorator");
-const mysql_1 = require("../middlewares/mysql");
+const mysql_1 = __importDefault(require("../middlewares/mysql"));
 let ArticleController = /** @class */ (() => {
     let ArticleController = class ArticleController {
         /**
@@ -118,19 +121,19 @@ let ArticleController = /** @class */ (() => {
         }
     };
     __decorate([
-        decorator_1.get('/list', mysql_1.mysql()),
+        decorator_1.get('/list', mysql_1.default()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], ArticleController.prototype, "getArticleList", null);
     __decorate([
-        decorator_1.get('/detail', mysql_1.mysql()),
+        decorator_1.get('/detail', mysql_1.default()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], ArticleController.prototype, "getArticleDetail", null);
     __decorate([
-        decorator_1.post('/add_article', mysql_1.mysql()),
+        decorator_1.post('/add_article', mysql_1.default()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)

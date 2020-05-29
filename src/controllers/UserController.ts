@@ -1,5 +1,6 @@
 import { controller, get, post } from '../common/decorator'
-import { mysql } from '../middlewares/mysql'
+import mysql from '../middlewares/mysql'
+import { responseStatus } from '../common/constant'
 
 @controller('/user')
 export default class UserController {
@@ -10,22 +11,24 @@ export default class UserController {
 	@post('/login', mysql())
 	async userLogin(ctx: any) {
 		const { username, password } = ctx.request.body
-		let status: string = 'FAIL'
+		let status: string = responseStatus.FAIL
 		let response: string = '登入失败'
 
 		try {
-			const passwords: any[] = await ctx.mysql.query(`
+			let sql: string = /*sql*/ `	
 				SELECT password FROM user WHERE username = '${username}';
-			`)
+			`
+			const passwords: any[] = await ctx.mysql.query(sql)
 
 			if (passwords && passwords.length > 0) {
 				const { password: existPassword } = passwords[0]
 				if (password === existPassword) {
 					try {
-						await ctx.mysql.query(`
+						let sql: string = /*sql*/ `
 							UPDATE user SET is_online = 1 WHERE username = '${username}';
-						`)
-						status = 'OK'
+						`
+						await ctx.mysql.query(sql)
+						status = responseStatus.OK
 						response = '登入成功'
 					} catch (e) {
 						console.error('SQL语句执行失败', e)
@@ -53,26 +56,28 @@ export default class UserController {
 	@post('/register', mysql())
 	async userRegister(ctx: any) {
 		const { username, password, nickname = '匿名' } = ctx.request.body
-		let status: string = 'FAIL'
+		let status: string = responseStatus.FAIL
 		let response: string = '注册失败！'
 
 		if (username && password) {
 			try {
-				const existUsername: object[] = await ctx.mysql.query(`
+				let sql: string = /*sql*/ `
 					SELECT username FROM user WHERE username = '${username}';
-				`)
+				`
+				const existUsername: object[] = await ctx.mysql.query(sql)
 
 				if (existUsername.length > 0) {
 					response = '该账号已存在！'
 				} else {
 					try {
-						await ctx.mysql.query(`
+						let sql: string = /*sql*/ `
 							INSERT INTO user SET 
 								username = '${username}', 
 								password = '${password}', 
 								nickname = '${nickname}';
-						`)
-						status = 'OK'
+						`
+						await ctx.mysql.query(sql)
+						status = responseStatus.OK
 						response = '注册成功！'
 					} catch (e) {
 						console.error('SQL语句执行失败', e)
@@ -95,18 +100,20 @@ export default class UserController {
 	 */
 	@post('/logout', mysql())
 	async userLogout(ctx: any) {
-		let status: string = 'FAIL'
+		let status: string = responseStatus.FAIL
 		let response: string = 'Logout failed'
 		const { username } = ctx.request.body
 		if (username) {
 			try {
-				const result = await ctx.mysql.query(`SELECT username FROM user`)
+				let sql: string = /*sql*/ `SELECT username FROM user`
+				const result = await ctx.mysql.query(sql)
 				if (result.length > 0) {
 					try {
-						await ctx.mysql.query(`
+						let sql: string = /*sql*/ `
 							UPDATE user SET is_online = 0 WHERE username = '${username}';
-						`)
-						status = 'OK'
+						`
+						await ctx.mysql.query(sql)
+						status = responseStatus.OK
 						response = '登出成功！'
 					} catch (e) {
 						console.error('执行SQL语句失败', e)
@@ -130,11 +137,11 @@ export default class UserController {
 	 */
 	@get('/baseInfo', mysql())
 	async getUserBaseInfo(ctx: any) {
-		let status: string = 'FAIL'
+		let status: string = responseStatus.FAIL
 		let response: any = '没有数据'
 		const { username } = ctx.query
 		try {
-			const result: object[] = await ctx.mysql.query(`
+			let sql: string = /*sql*/ `
 				SELECT 
 					id AS userId,
 					username,
@@ -143,9 +150,10 @@ export default class UserController {
 					is_online AS isOnline
 				FROM user
 				WHERE username = '${username}';
-			`)
+			`
+			const result: object[] = await ctx.mysql.query(sql)
 			if (result.length > 0) {
-				status = 'OK'
+				status = responseStatus.OK
 				response = result[0]
 			}
 		} catch (e) {

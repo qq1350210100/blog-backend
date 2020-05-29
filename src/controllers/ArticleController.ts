@@ -1,5 +1,6 @@
 import { controller, get, post } from '../common/decorator'
-import { mysql } from '../middlewares/mysql'
+import mysql from '../middlewares/mysql'
+import { responseStatus } from '../common/constant'
 
 @controller('/article')
 export default class ArticleController {
@@ -9,28 +10,33 @@ export default class ArticleController {
 	 */
 	@get('/list', mysql())
 	async getArticleList(ctx: any) {
-		let status: string = 'FAIL'
+		let status: string = responseStatus.FAIL
 		let response: any = '没有数据'
 		const { sort } = ctx.query
-		const articleList: string[] = await ctx.mysql.query(`
-			SELECT
-				id               AS id,
-				sort             AS sort,
-				title            AS title,
-				background_image AS backgroundImage,
-				author           AS author,
-				views            AS views,
-				tags             AS tags
-			FROM article
-			${sort ? `WHERE sort = '${sort}'` : ''};
-		`)
-		if (articleList.length > 0) {
-			status = 'OK'
-			response = articleList.map((item: any) => {
-				const { tags } = item
-				const tagsList: string[] = tags.split(',')
-				return { ...item, tags: tagsList }
-			})
+		try {
+			let sql: string = /*sql*/ `
+				SELECT
+					id               AS id,
+					sort             AS sort,
+					title            AS title,
+					background_image AS backgroundImage,
+					author           AS author,
+					views            AS views,
+					tags             AS tags
+				FROM article
+				${sort ? `WHERE sort = '${sort}'` : ''};
+			`
+			const articleList: string[] = await ctx.mysql.query(sql)
+			if (articleList.length > 0) {
+				status = responseStatus.OK
+				response = articleList.map((item: any) => {
+					const { tags } = item
+					const tagsList: string[] = tags.split(',')
+					return { ...item, tags: tagsList }
+				})
+			}
+		} catch (e) {
+			console.error('执行SQL语句失败', e)
 		}
 		ctx.body = {
 			status,
@@ -44,12 +50,12 @@ export default class ArticleController {
 	 */
 	@get('/detail', mysql())
 	async getArticleDetail(ctx: any) {
-		let status: string = 'FAIL'
+		let status: string = responseStatus.FAIL
 		let response: any = '没有数据'
 		const { articleId } = ctx.query
 		if (articleId) {
 			try {
-				const data: any[] = await ctx.mysql.query(`
+				let sql: string = /*sql*/ `
 					SELECT 
 						background_image AS backgroundImage, 
 						title,
@@ -59,16 +65,17 @@ export default class ArticleController {
 						views,
 						tags 
 					FROM article WHERE id = ${articleId};
-				`)
+				`
+				const data: any[] = await ctx.mysql.query(sql)
 				const result = data[0]
 				if (result) {
 					const { tags } = result
 					const tagArr: string[] = tags ? tags.split(',') : []
-					status = 'OK'
+					status = responseStatus.OK
 					response = { ...result, articleId, tags: tagArr }
 				}
 			} catch (e) {
-				console.error('执行SQL语句失败')
+				console.error('执行SQL语句失败', e)
 			}
 		}
 		ctx.body = {
@@ -83,7 +90,7 @@ export default class ArticleController {
 	 */
 	@post('/add_article', mysql())
 	async addArticle(ctx: any) {
-		let status: string = 'FAIL'
+		let status: string = responseStatus.FAIL
 		let response: any = null
 		const { nickname, title, content, sort, tags = [] } = ctx.request.body
 		let tagsStr: string = ''
@@ -91,18 +98,19 @@ export default class ArticleController {
 			tagsStr = tags.join(',')
 		}
 		try {
-			await ctx.mysql.query(`
+			let sql: string = /*sql*/ `
 				INSERT INTO article SET 
 					title = '${title}',
 					content = '${content}',
 					author = '${nickname}',
 					sort = '${sort}',
 					tags = '${tagsStr}';
-			`)
-			status = 'OK'
+			`
+			await ctx.mysql.query(sql)
+			status = responseStatus.OK
 			response = '添加成功'
 		} catch (e) {
-			console.error('执行SQL语句失败')
+			console.error('执行SQL语句失败', e)
 		}
 		ctx.body = {
 			status,

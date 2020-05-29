@@ -8,9 +8,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const decorator_1 = require("../common/decorator");
-const mysql_1 = require("../middlewares/mysql");
+const mysql_1 = __importDefault(require("../middlewares/mysql"));
 let UserController = /** @class */ (() => {
     let UserController = class UserController {
         /**
@@ -22,16 +25,18 @@ let UserController = /** @class */ (() => {
             let status = 'FAIL';
             let response = '登入失败';
             try {
-                const passwords = await ctx.mysql.query(`
+                let sql = `	
 				SELECT password FROM user WHERE username = '${username}';
-			`);
+			`;
+                const passwords = await ctx.mysql.query(sql);
                 if (passwords && passwords.length > 0) {
                     const { password: existPassword } = passwords[0];
                     if (password === existPassword) {
                         try {
-                            await ctx.mysql.query(`
+                            let sql = `
 							UPDATE user SET is_online = 1 WHERE username = '${username}';
-						`);
+						`;
+                            await ctx.mysql.query(sql);
                             status = 'OK';
                             response = '登入成功';
                         }
@@ -65,20 +70,22 @@ let UserController = /** @class */ (() => {
             let response = '注册失败！';
             if (username && password) {
                 try {
-                    const existUsername = await ctx.mysql.query(`
+                    let sql = `
 					SELECT username FROM user WHERE username = '${username}';
-				`);
+				`;
+                    const existUsername = await ctx.mysql.query(sql);
                     if (existUsername.length > 0) {
                         response = '该账号已存在！';
                     }
                     else {
                         try {
-                            await ctx.mysql.query(`
+                            let sql = `
 							INSERT INTO user SET 
 								username = '${username}', 
 								password = '${password}', 
 								nickname = '${nickname}';
-						`);
+						`;
+                            await ctx.mysql.query(sql);
                             status = 'OK';
                             response = '注册成功！';
                         }
@@ -106,12 +113,14 @@ let UserController = /** @class */ (() => {
             const { username } = ctx.request.body;
             if (username) {
                 try {
-                    const result = await ctx.mysql.query(`SELECT username FROM user`);
+                    let sql = `SELECT username FROM user`;
+                    const result = await ctx.mysql.query(sql);
                     if (result.length > 0) {
                         try {
-                            await ctx.mysql.query(`
+                            let sql = `
 							UPDATE user SET is_online = 0 WHERE username = '${username}';
-						`);
+						`;
+                            await ctx.mysql.query(sql);
                             status = 'OK';
                             response = '登出成功！';
                         }
@@ -141,7 +150,7 @@ let UserController = /** @class */ (() => {
             let response = '没有数据';
             const { username } = ctx.query;
             try {
-                const result = await ctx.mysql.query(`
+                let sql = `
 				SELECT 
 					id AS userId,
 					username,
@@ -150,7 +159,8 @@ let UserController = /** @class */ (() => {
 					is_online AS isOnline
 				FROM user
 				WHERE username = '${username}';
-			`);
+			`;
+                const result = await ctx.mysql.query(sql);
                 if (result.length > 0) {
                     status = 'OK';
                     response = result[0];
@@ -166,25 +176,25 @@ let UserController = /** @class */ (() => {
         }
     };
     __decorate([
-        decorator_1.post('/login', mysql_1.mysql()),
+        decorator_1.post('/login', mysql_1.default()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "userLogin", null);
     __decorate([
-        decorator_1.post('/register', mysql_1.mysql()),
+        decorator_1.post('/register', mysql_1.default()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "userRegister", null);
     __decorate([
-        decorator_1.post('/logout', mysql_1.mysql()),
+        decorator_1.post('/logout', mysql_1.default()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "userLogout", null);
     __decorate([
-        decorator_1.get('/baseInfo', mysql_1.mysql()),
+        decorator_1.get('/baseInfo', mysql_1.default()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)

@@ -1,20 +1,5 @@
 import bodyParser from 'koa-bodyparser'
-
-interface ReadonlyMethod {
-	readonly [key: string]: string
-}
-
-/**
- * 请求方法
- */
-export const requestMethod: ReadonlyMethod = {
-	GET: 'get',
-	POST: 'post',
-	PUT: 'pust',
-	DELETE: 'delete',
-	OPTION: 'option',
-	PATCH: 'patch'
-}
+import { requestMethod } from './constant'
 
 /**
  * 定义注册的路由数组
