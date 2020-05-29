@@ -75,20 +75,3 @@ export const post: RequestDecorator = (url, ...middleware) =>
 
 export const put: RequestDecorator = (url, ...middleware) =>
 	requestMapping({ method: requestMethod.PUT, url, middleware: [bodyParser(), ...middleware] })
-
-
-export function required() {
-	return (target: any, name: string, descriptor: any) => {
-		// 如果没有传自定义url，默认取方法名作为url
-		if (!url) url = name
-		// 创建router需要的数据 url，method，middleware（非必需），最终执行的方法，装饰器对象的构造函数
-		const controller = {
-			url,
-			method,
-			middleware,
-			handler: target[name],
-			constructor: target.constructor
-		}
-		controllers.push(controller)
-	}
-}

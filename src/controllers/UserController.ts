@@ -1,11 +1,11 @@
-import { controller, post } from '../common/decorator'
+import { controller, get, post } from '../common/decorator'
 import { mysql } from '../middlewares/mysql'
 
 @controller('/user')
 export default class UserController {
 	/**
 	 * 用户登录
-	 * @param ctx
+	 * @param ctx Context
 	 */
 	@post('/login', mysql())
 	async userLogin(ctx: any) {
@@ -14,7 +14,7 @@ export default class UserController {
 		let response: string = '登入失败'
 
 		try {
-			const passwords = await ctx.mysql.query(`
+			const passwords: any[] = await ctx.mysql.query(`
 				SELECT password FROM user WHERE username = '${username}';
 			`)
 
@@ -48,7 +48,7 @@ export default class UserController {
 
 	/**
 	 * 用户注册
-	 * @param ctx
+	 * @param ctx Context
 	 */
 	@post('/register', mysql())
 	async userRegister(ctx: any) {
@@ -58,7 +58,7 @@ export default class UserController {
 
 		if (username && password) {
 			try {
-				const existUsername = await ctx.mysql.query(`
+				const existUsername: object[] = await ctx.mysql.query(`
 					SELECT username FROM user WHERE username = '${username}';
 				`)
 
@@ -91,7 +91,7 @@ export default class UserController {
 
 	/**
 	 * 用户登出
-	 * @param ctx
+	 * @param ctx Context
 	 */
 	@post('/logout', mysql())
 	async userLogout(ctx: any) {
@@ -117,6 +117,39 @@ export default class UserController {
 			} catch (e) {
 				console.error('执行SQL语句失败', e)
 			}
+		}
+		ctx.body = {
+			status,
+			payload: response
+		}
+	}
+
+	/**
+	 * 获取用户基本信息
+	 * @param ctx Context
+	 */
+	@get('/baseInfo', mysql())
+	async getUserBaseInfo(ctx: any) {
+		let status: string = 'FAIL'
+		let response: any = '没有数据'
+		const { username } = ctx.query
+		try {
+			const result: object[] = await ctx.mysql.query(`
+				SELECT 
+					id AS userId,
+					username,
+					nickname,
+					level,
+					is_online AS isOnline
+				FROM user
+				WHERE username = '${username}';
+			`)
+			if (result.length > 0) {
+				status = 'OK'
+				response = result[0]
+			}
+		} catch (e) {
+			console.error('执行SQL语句失败', e)
 		}
 		ctx.body = {
 			status,
