@@ -13,9 +13,9 @@
     "mysql": "^2.18.1"
   },
   "scripts": {
-    "start": "tsc -m commonjs && node ./dist/index.js",
+    "server": "tsc && node ./dist/index.js",
     "dev": "tsnd -P ./tsconfig.json --respawn ./src/index.ts",
-    "build": "tsc -m commonjs"
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/koa": "^2.11.3",
