@@ -1,8 +1,14 @@
-import bodyParser from 'koa-bodyparser';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.put = exports.post = exports.get = exports.requestMapping = exports.controller = exports.controllers = exports.requestMethod = void 0;
+const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
 /**
  * 请求方法
  */
-export const requestMethod = {
+exports.requestMethod = {
     GET: 'get',
     POST: 'post',
     PUT: 'pust',
@@ -13,17 +19,17 @@ export const requestMethod = {
 /**
  * 定义注册的路由数组
  */
-export const controllers = [];
+exports.controllers = [];
 /**
  * controller类装饰器
  * @param {string} prefix // 请求路径前缀
  */
-export const controller = (prefix = '') => (target) => {
+exports.controller = (prefix = '') => (target) => {
     target.prefix = prefix;
     // 给controller类添加路由前缀
     console.log('Controller: ', target);
 };
-export function requestMapping({ url = '', method = '', middleware = [] }) {
+function requestMapping({ url = '', method = '', middleware = [] }) {
     return (target, name, descriptor) => {
         // 如果没有传自定义url，默认取方法名作为url
         if (!url)
@@ -36,9 +42,10 @@ export function requestMapping({ url = '', method = '', middleware = [] }) {
             handler: target[name],
             constructor: target.constructor
         };
-        controllers.push(controller);
+        exports.controllers.push(controller);
     };
 }
-export const get = (url, ...middleware) => requestMapping({ method: requestMethod.GET, url, middleware });
-export const post = (url, ...middleware) => requestMapping({ method: requestMethod.POST, url, middleware: [bodyParser(), ...middleware] });
-export const put = (url, ...middleware) => requestMapping({ method: requestMethod.PUT, url, middleware: [bodyParser(), ...middleware] });
+exports.requestMapping = requestMapping;
+exports.get = (url, ...middleware) => requestMapping({ method: exports.requestMethod.GET, url, middleware });
+exports.post = (url, ...middleware) => requestMapping({ method: exports.requestMethod.POST, url, middleware: [koa_bodyparser_1.default(), ...middleware] });
+exports.put = (url, ...middleware) => requestMapping({ method: exports.requestMethod.PUT, url, middleware: [koa_bodyparser_1.default(), ...middleware] });

@@ -1,4 +1,9 @@
-import mysql from 'mysql';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mysql_1 = __importDefault(require("mysql"));
 const config = {
     host: 'localhost',
     user: 'root',
@@ -7,7 +12,7 @@ const config = {
     port: 3306,
     multipleStatements: true //允许多条sql同时执行
 };
-const pool = mysql.createPool(config);
+const pool = mysql_1.default.createPool(config);
 class Mysql {
     constructor() { }
     query(sql) {
@@ -22,4 +27,4 @@ class Mysql {
     }
 }
 const mysqlDB = new Mysql();
-export default mysqlDB;
+exports.default = mysqlDB;

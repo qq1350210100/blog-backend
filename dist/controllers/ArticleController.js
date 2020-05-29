@@ -1,3 +1,4 @@
+"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -7,8 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { controller, get, post } from '../common/decorator';
-import { mysql } from '../middlewares/mysql';
+Object.defineProperty(exports, "__esModule", { value: true });
+const decorator_1 = require("../common/decorator");
+const mysql_1 = require("../middlewares/mysql");
 let ArticleController = /** @class */ (() => {
     let ArticleController = class ArticleController {
         /**
@@ -116,26 +118,26 @@ let ArticleController = /** @class */ (() => {
         }
     };
     __decorate([
-        get('/list', mysql()),
+        decorator_1.get('/list', mysql_1.mysql()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], ArticleController.prototype, "getArticleList", null);
     __decorate([
-        get('/detail', mysql()),
+        decorator_1.get('/detail', mysql_1.mysql()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], ArticleController.prototype, "getArticleDetail", null);
     __decorate([
-        post('/add_article', mysql()),
+        decorator_1.post('/add_article', mysql_1.mysql()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], ArticleController.prototype, "addArticle", null);
     ArticleController = __decorate([
-        controller('/article')
+        decorator_1.controller('/article')
     ], ArticleController);
     return ArticleController;
 })();
-export default ArticleController;
+exports.default = ArticleController;

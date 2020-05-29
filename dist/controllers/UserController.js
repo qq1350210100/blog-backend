@@ -1,3 +1,4 @@
+"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -7,8 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { controller, get, post } from '../common/decorator';
-import { mysql } from '../middlewares/mysql';
+Object.defineProperty(exports, "__esModule", { value: true });
+const decorator_1 = require("../common/decorator");
+const mysql_1 = require("../middlewares/mysql");
 let UserController = /** @class */ (() => {
     let UserController = class UserController {
         /**
@@ -164,32 +166,32 @@ let UserController = /** @class */ (() => {
         }
     };
     __decorate([
-        post('/login', mysql()),
+        decorator_1.post('/login', mysql_1.mysql()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "userLogin", null);
     __decorate([
-        post('/register', mysql()),
+        decorator_1.post('/register', mysql_1.mysql()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "userRegister", null);
     __decorate([
-        post('/logout', mysql()),
+        decorator_1.post('/logout', mysql_1.mysql()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "userLogout", null);
     __decorate([
-        get('/baseInfo', mysql()),
+        decorator_1.get('/baseInfo', mysql_1.mysql()),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "getUserBaseInfo", null);
     UserController = __decorate([
-        controller('/user')
+        decorator_1.controller('/user')
     ], UserController);
     return UserController;
 })();
-export default UserController;
+exports.default = UserController;
