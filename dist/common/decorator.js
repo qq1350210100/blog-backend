@@ -3,19 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.put = exports.post = exports.get = exports.requestMapping = exports.controller = exports.controllers = exports.requestMethod = void 0;
+exports.put = exports.post = exports.get = exports.requestMapping = exports.controller = exports.controllers = void 0;
 const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
-/**
- * 请求方法
- */
-exports.requestMethod = {
-    GET: 'get',
-    POST: 'post',
-    PUT: 'pust',
-    DELETE: 'delete',
-    OPTION: 'option',
-    PATCH: 'patch'
-};
+const constant_1 = require("./constant");
 /**
  * 定义注册的路由数组
  */
@@ -46,6 +36,6 @@ function requestMapping({ url = '', method = '', middleware = [] }) {
     };
 }
 exports.requestMapping = requestMapping;
-exports.get = (url, ...middleware) => requestMapping({ method: exports.requestMethod.GET, url, middleware });
-exports.post = (url, ...middleware) => requestMapping({ method: exports.requestMethod.POST, url, middleware: [koa_bodyparser_1.default(), ...middleware] });
-exports.put = (url, ...middleware) => requestMapping({ method: exports.requestMethod.PUT, url, middleware: [koa_bodyparser_1.default(), ...middleware] });
+exports.get = (url, ...middleware) => requestMapping({ method: constant_1.requestMethod.GET, url, middleware });
+exports.post = (url, ...middleware) => requestMapping({ method: constant_1.requestMethod.POST, url, middleware: [koa_bodyparser_1.default(), ...middleware] });
+exports.put = (url, ...middleware) => requestMapping({ method: constant_1.requestMethod.PUT, url, middleware: [koa_bodyparser_1.default(), ...middleware] });

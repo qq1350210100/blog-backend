@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const decorator_1 = require("../common/decorator");
 const mysql_1 = __importDefault(require("../middlewares/mysql"));
+const constant_1 = require("../common/constant");
 let UserController = /** @class */ (() => {
     let UserController = class UserController {
         /**
@@ -22,7 +23,7 @@ let UserController = /** @class */ (() => {
          */
         async userLogin(ctx) {
             const { username, password } = ctx.request.body;
-            let status = 'FAIL';
+            let status = constant_1.responseStatus.FAIL;
             let response = '登入失败';
             try {
                 let sql = `	
@@ -37,7 +38,7 @@ let UserController = /** @class */ (() => {
 							UPDATE user SET is_online = 1 WHERE username = '${username}';
 						`;
                             await ctx.mysql.query(sql);
-                            status = 'OK';
+                            status = constant_1.responseStatus.OK;
                             response = '登入成功';
                         }
                         catch (e) {
@@ -66,7 +67,7 @@ let UserController = /** @class */ (() => {
          */
         async userRegister(ctx) {
             const { username, password, nickname = '匿名' } = ctx.request.body;
-            let status = 'FAIL';
+            let status = constant_1.responseStatus.FAIL;
             let response = '注册失败！';
             if (username && password) {
                 try {
@@ -86,7 +87,7 @@ let UserController = /** @class */ (() => {
 								nickname = '${nickname}';
 						`;
                             await ctx.mysql.query(sql);
-                            status = 'OK';
+                            status = constant_1.responseStatus.OK;
                             response = '注册成功！';
                         }
                         catch (e) {
@@ -108,8 +109,8 @@ let UserController = /** @class */ (() => {
          * @param ctx Context
          */
         async userLogout(ctx) {
-            let status = 'FAIL';
-            let response = 'Logout failed';
+            let status = constant_1.responseStatus.FAIL;
+            let response = '登出失败！';
             const { username } = ctx.request.body;
             if (username) {
                 try {
@@ -121,7 +122,7 @@ let UserController = /** @class */ (() => {
 							UPDATE user SET is_online = 0 WHERE username = '${username}';
 						`;
                             await ctx.mysql.query(sql);
-                            status = 'OK';
+                            status = constant_1.responseStatus.OK;
                             response = '登出成功！';
                         }
                         catch (e) {
@@ -146,8 +147,8 @@ let UserController = /** @class */ (() => {
          * @param ctx Context
          */
         async getUserBaseInfo(ctx) {
-            let status = 'FAIL';
-            let response = '没有数据';
+            let status = constant_1.responseStatus.FAIL;
+            let response = {};
             const { username } = ctx.query;
             try {
                 let sql = `
@@ -162,7 +163,7 @@ let UserController = /** @class */ (() => {
 			`;
                 const result = await ctx.mysql.query(sql);
                 if (result.length > 0) {
-                    status = 'OK';
+                    status = constant_1.responseStatus.OK;
                     response = result[0];
                 }
             }

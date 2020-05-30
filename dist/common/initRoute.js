@@ -13,6 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const decorator_1 = require("./decorator");
 __exportStar(require("../controllers/UserController"), exports);
 __exportStar(require("../controllers/ArticleController"), exports);
+__exportStar(require("../controllers/SettingController"), exports);
 function initRoutes(app, router) {
     decorator_1.controllers.forEach((controller) => {
         // 获取每个路由的前缀

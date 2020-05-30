@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const decorator_1 = require("../common/decorator");
 const mysql_1 = __importDefault(require("../middlewares/mysql"));
+const constant_1 = require("../common/constant");
 let ArticleController = /** @class */ (() => {
     let ArticleController = class ArticleController {
         /**
@@ -21,28 +22,34 @@ let ArticleController = /** @class */ (() => {
          * @param ctx Context
          */
         async getArticleList(ctx) {
-            let status = 'FAIL';
+            let status = constant_1.responseStatus.FAIL;
             let response = '没有数据';
             const { sort } = ctx.query;
-            const articleList = await ctx.mysql.query(`
-			SELECT
-				id               AS id,
-				sort             AS sort,
-				title            AS title,
-				background_image AS backgroundImage,
-				author           AS author,
-				views            AS views,
-				tags             AS tags
-			FROM article
-			${sort ? `WHERE sort = '${sort}'` : ''};
-		`);
-            if (articleList.length > 0) {
-                status = 'OK';
-                response = articleList.map((item) => {
-                    const { tags } = item;
-                    const tagsList = tags.split(',');
-                    return { ...item, tags: tagsList };
-                });
+            try {
+                let sql = `
+				SELECT
+					id               AS id,
+					sort             AS sort,
+					title            AS title,
+					background_image AS backgroundImage,
+					author           AS author,
+					views            AS views,
+					tags             AS tags
+				FROM article
+				${sort ? `WHERE sort = '${sort}'` : ''};
+			`;
+                const articleList = await ctx.mysql.query(sql);
+                if (articleList.length > 0) {
+                    status = constant_1.responseStatus.OK;
+                    response = articleList.map((item) => {
+                        const { tags } = item;
+                        const tagsList = tags.split(',');
+                        return { ...item, tags: tagsList };
+                    });
+                }
+            }
+            catch (e) {
+                console.error('SQL语句执行失败', e);
             }
             ctx.body = {
                 status,
@@ -54,12 +61,12 @@ let ArticleController = /** @class */ (() => {
          * @param ctx Context
          */
         async getArticleDetail(ctx) {
-            let status = 'FAIL';
+            let status = constant_1.responseStatus.FAIL;
             let response = '没有数据';
             const { articleId } = ctx.query;
             if (articleId) {
                 try {
-                    const data = await ctx.mysql.query(`
+                    let sql = `
 					SELECT 
 						background_image AS backgroundImage, 
 						title,
@@ -69,17 +76,18 @@ let ArticleController = /** @class */ (() => {
 						views,
 						tags 
 					FROM article WHERE id = ${articleId};
-				`);
+				`;
+                    const data = await ctx.mysql.query(sql);
                     const result = data[0];
                     if (result) {
                         const { tags } = result;
                         const tagArr = tags ? tags.split(',') : [];
-                        status = 'OK';
+                        status = constant_1.responseStatus.OK;
                         response = { ...result, articleId, tags: tagArr };
                     }
                 }
                 catch (e) {
-                    console.error('SQL语句执行失败');
+                    console.error('SQL语句执行失败', e);
                 }
             }
             ctx.body = {
@@ -92,7 +100,7 @@ let ArticleController = /** @class */ (() => {
          * @param ctx Context
          */
         async addArticle(ctx) {
-            let status = 'FAIL';
+            let status = constant_1.responseStatus.FAIL;
             let response = null;
             const { nickname, title, content, sort, tags = [] } = ctx.request.body;
             let tagsStr = '';
@@ -100,19 +108,20 @@ let ArticleController = /** @class */ (() => {
                 tagsStr = tags.join(',');
             }
             try {
-                await ctx.mysql.query(`
+                let sql = `
 				INSERT INTO article SET 
 					title = '${title}',
 					content = '${content}',
 					author = '${nickname}',
 					sort = '${sort}',
 					tags = '${tagsStr}';
-			`);
-                status = 'OK';
+			`;
+                await ctx.mysql.query(sql);
+                status = constant_1.responseStatus.OK;
                 response = '添加成功';
             }
             catch (e) {
-                console.error('SQL语句执行失败');
+                console.error('SQL语句执行失败', e);
             }
             ctx.body = {
                 status,

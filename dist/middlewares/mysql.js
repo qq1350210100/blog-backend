@@ -13,12 +13,11 @@ const config = {
     multipleStatements: true //允许多条sql同时执行
 };
 const pool = mysql_1.default.createPool(config);
-console.log('11111');
 class Mysql {
     constructor() { }
     query(sql) {
         return new Promise((resolve, reject) => {
-            pool.query(sql, function (error, results, fields) {
+            pool.query(sql, (error, results, fields) => {
                 if (error) {
                     reject(error);
                 }
