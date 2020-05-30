@@ -101,7 +101,7 @@ export default class UserController {
 	@post('/logout', mysql())
 	async userLogout(ctx: any) {
 		let status: string = responseStatus.FAIL
-		let response: string = 'Logout failed'
+		let response: string = '登出失败！'
 		const { username } = ctx.request.body
 		if (username) {
 			try {
@@ -116,13 +116,13 @@ export default class UserController {
 						status = responseStatus.OK
 						response = '登出成功！'
 					} catch (e) {
-						console.error('执行SQL语句失败', e)
+						console.error('SQL语句执行失败', e)
 					}
 				} else {
 					response = '账号不存在！'
 				}
 			} catch (e) {
-				console.error('执行SQL语句失败', e)
+				console.error('SQL语句执行失败', e)
 			}
 		}
 		ctx.body = {
@@ -138,7 +138,7 @@ export default class UserController {
 	@get('/baseInfo', mysql())
 	async getUserBaseInfo(ctx: any) {
 		let status: string = responseStatus.FAIL
-		let response: any = '没有数据'
+		let response: object = {}
 		const { username } = ctx.query
 		try {
 			let sql: string = /*sql*/ `
@@ -157,7 +157,7 @@ export default class UserController {
 				response = result[0]
 			}
 		} catch (e) {
-			console.error('执行SQL语句失败', e)
+			console.error('SQL语句执行失败', e)
 		}
 		ctx.body = {
 			status,

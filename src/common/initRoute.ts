@@ -1,7 +1,7 @@
 import { controllers } from './decorator'
-import'../controllers/UserController'
-import'../controllers/ArticleController'
-import'../controllers/SettingController'
+export * from '../controllers/UserController'
+export * from '../controllers/ArticleController'
+export * from '../controllers/SettingController'
 
 export default function initRoutes(app: any, router: any) {
 	controllers.forEach((controller: any) => {

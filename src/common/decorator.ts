@@ -49,7 +49,7 @@ export function requestMapping({ url = '', method = '', middleware = [] }: Optio
  * middleware: 中间件
  */
 interface RequestDecorator {
-	(url: string, ...middleware: any): Function
+	(url: string, ...middleware: any[]): Function
 }
 
 export const get: RequestDecorator = (url, ...middleware) =>

@@ -125,7 +125,7 @@ let UserController = /** @class */ (() => {
                             response = '登出成功！';
                         }
                         catch (e) {
-                            console.error('执行SQL语句失败', e);
+                            console.error('SQL语句执行失败', e);
                         }
                     }
                     else {
@@ -133,7 +133,7 @@ let UserController = /** @class */ (() => {
                     }
                 }
                 catch (e) {
-                    console.error('执行SQL语句失败', e);
+                    console.error('SQL语句执行失败', e);
                 }
             }
             ctx.body = {
@@ -167,7 +167,7 @@ let UserController = /** @class */ (() => {
                 }
             }
             catch (e) {
-                console.error('执行SQL语句失败', e);
+                console.error('SQL语句执行失败', e);
             }
             ctx.body = {
                 status,

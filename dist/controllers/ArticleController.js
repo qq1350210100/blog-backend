@@ -79,7 +79,7 @@ let ArticleController = /** @class */ (() => {
                     }
                 }
                 catch (e) {
-                    console.error('执行SQL语句失败');
+                    console.error('SQL语句执行失败');
                 }
             }
             ctx.body = {
@@ -112,7 +112,7 @@ let ArticleController = /** @class */ (() => {
                 response = '添加成功';
             }
             catch (e) {
-                console.error('执行SQL语句失败');
+                console.error('SQL语句执行失败');
             }
             ctx.body = {
                 status,

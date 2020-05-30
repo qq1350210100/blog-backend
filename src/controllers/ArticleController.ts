@@ -36,7 +36,7 @@ export default class ArticleController {
 				})
 			}
 		} catch (e) {
-			console.error('执行SQL语句失败', e)
+			console.error('SQL语句执行失败', e)
 		}
 		ctx.body = {
 			status,
@@ -75,7 +75,7 @@ export default class ArticleController {
 					response = { ...result, articleId, tags: tagArr }
 				}
 			} catch (e) {
-				console.error('执行SQL语句失败', e)
+				console.error('SQL语句执行失败', e)
 			}
 		}
 		ctx.body = {
@@ -110,7 +110,7 @@ export default class ArticleController {
 			status = responseStatus.OK
 			response = '添加成功'
 		} catch (e) {
-			console.error('执行SQL语句失败', e)
+			console.error('SQL语句执行失败', e)
 		}
 		ctx.body = {
 			status,
