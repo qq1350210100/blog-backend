@@ -17,7 +17,7 @@ exports.controllers = [];
 exports.controller = (prefix = '') => (target) => {
     target.prefix = prefix;
     // 给controller类添加路由前缀
-    console.log('Controller: ', target);
+    console.log('Controller: ', target.name);
 };
 function requestMapping({ url = '', method = '', middleware = [] }) {
     return (target, name, descriptor) => {

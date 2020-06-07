@@ -26,7 +26,7 @@ let UserController = /** @class */ (() => {
             let status = constant_1.responseStatus.FAIL;
             let response = '登入失败';
             try {
-                let sql = `	
+                let sql = `
 				SELECT password FROM user WHERE username = '${username}';
 			`;
                 const passwords = await ctx.mysql.query(sql);

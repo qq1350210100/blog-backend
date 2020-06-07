@@ -92,7 +92,8 @@ export default class ArticleController {
 	async addArticle(ctx: any) {
 		let status: string = responseStatus.FAIL
 		let response: any = null
-		const { nickname, title, content, sort, tags = [] } = ctx.request.body
+		const { userId, articleDetail } = ctx.request.body
+		const { title, author, content, sort, tags = [] } = articleDetail
 		let tagsStr: string = ''
 		if (tags.length > 0) {
 			tagsStr = tags.join(',')
@@ -102,7 +103,7 @@ export default class ArticleController {
 				INSERT INTO article SET 
 					title = '${title}',
 					content = '${content}',
-					author = '${nickname}',
+					author = '${author}',
 					sort = '${sort}',
 					tags = '${tagsStr}';
 			`

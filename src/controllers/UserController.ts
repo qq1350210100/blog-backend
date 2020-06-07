@@ -12,16 +12,15 @@ export default class UserController {
 	async userLogin(ctx: any) {
 		const { username, password } = ctx.request.body
 		let status: string = responseStatus.FAIL
-		let response: string = '登入失败'
+		let response: any = '登入失败'
 
 		try {
-			let sql: string = /*sql*/ `	
-				SELECT password FROM user WHERE username = '${username}';
+			let sql: string = /*sql*/ `
+				SELECT password AS password, id AS userId FROM user WHERE username = '${username}';
 			`
-			const passwords: any[] = await ctx.mysql.query(sql)
-
-			if (passwords && passwords.length > 0) {
-				const { password: existPassword } = passwords[0]
+			const result: any[] = await ctx.mysql.query(sql)
+			if (result && result.length > 0) {
+				const { password: existPassword, userId } = result[0]
 				if (password === existPassword) {
 					try {
 						let sql: string = /*sql*/ `
@@ -29,7 +28,7 @@ export default class UserController {
 						`
 						await ctx.mysql.query(sql)
 						status = responseStatus.OK
-						response = '登入成功'
+						response = { userId }
 					} catch (e) {
 						console.error('SQL语句执行失败', e)
 					}
@@ -135,7 +134,7 @@ export default class UserController {
 	 * 获取用户基本信息
 	 * @param ctx Context
 	 */
-	@get('/baseInfo', mysql())
+	@get('/base_info', mysql())
 	async getUserBaseInfo(ctx: any) {
 		let status: string = responseStatus.FAIL
 		let response: object = {}
@@ -146,6 +145,7 @@ export default class UserController {
 					id AS userId,
 					username,
 					nickname,
+					avatar,
 					level,
 					is_online AS isOnline
 				FROM user

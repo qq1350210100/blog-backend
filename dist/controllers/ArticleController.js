@@ -102,7 +102,8 @@ let ArticleController = /** @class */ (() => {
         async addArticle(ctx) {
             let status = constant_1.responseStatus.FAIL;
             let response = null;
-            const { nickname, title, content, sort, tags = [] } = ctx.request.body;
+            const { userId, articleDetail } = ctx.request.body;
+            const { title, author, content, sort, tags = [] } = articleDetail;
             let tagsStr = '';
             if (tags.length > 0) {
                 tagsStr = tags.join(',');
@@ -112,7 +113,7 @@ let ArticleController = /** @class */ (() => {
 				INSERT INTO article SET 
 					title = '${title}',
 					content = '${content}',
-					author = '${nickname}',
+					author = '${author}',
 					sort = '${sort}',
 					tags = '${tagsStr}';
 			`;

@@ -13,7 +13,7 @@ export const controllers: object[] = []
 export const controller = (prefix: string = '') => (target: any) => {
 	target.prefix = prefix
 	// 给controller类添加路由前缀
-	console.log('Controller: ', target)
+	console.log('Controller: ', target.name)
 }
 
 /**
