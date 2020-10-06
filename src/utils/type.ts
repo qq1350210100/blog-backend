@@ -1,3 +1,5 @@
+import { ReadStream } from 'fs'
+
 export interface AnyObj extends Object {
   [key: string]: any
 }
@@ -29,3 +31,7 @@ export interface ArticleInfo {
 }
 
 export type ArticleDetail = ArticleInfo & { content: string }
+
+export interface File extends ReadStream {
+  filename: string
+}
