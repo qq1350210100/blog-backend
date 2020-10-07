@@ -1,7 +1,6 @@
-import { Controller } from '../utils/baseClass'
+import Controller from '../utils/baseClass/Controller'
 import { prefix, summary, body, tagsAll } from 'koa-swagger-decorator'
 import { get, post } from '../utils/requestMapping'
-import * as service from '../services'
 import { RespMsg } from '../utils/enums'
 
 @prefix('/user')
@@ -13,7 +12,7 @@ export default class UserController extends Controller {
     const { session } = this.ctx
     if (session?.userId) {
       const userId = session.userId
-      const userInfo = await service.User.find({ userId })
+      const userInfo = await this.service.User.find({ userId })
       if (userInfo) {
         const result = {
           ...userInfo.profile,
@@ -34,7 +33,7 @@ export default class UserController extends Controller {
   })
   public async signIn() {
     const { username, password } = this.ctx.request.body
-    const user = new service.User()
+    const user = new this.service.User()
     user.profile = {
       nickname: '匿名'
     }
@@ -58,7 +57,7 @@ export default class UserController extends Controller {
   })
   public async register() {
     const { username, password, profile = {} } = this.ctx.request.body
-    const user = new service.User()
+    const user = new this.service.User()
     try {
       await user.register(username, password, {
         ...profile,
@@ -75,7 +74,7 @@ export default class UserController extends Controller {
   @summary('user account sign out')
   public async signOut() {
     if (this.ctx.session && this.ctx.session.userId) {
-      await service.User.signOut(this.ctx.session.userId)
+      await this.service.User.signOut(this.ctx.session.userId)
       this.ctx.session = null
       this.ctx.resp({}, RespMsg.OK, 200)
     } else {

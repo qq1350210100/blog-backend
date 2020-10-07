@@ -1,8 +1,14 @@
 import { ArticleInfo, ArticleDetail } from '../utils/type'
-import * as artileDAO from '../dao/article'
 import { EventEmitter } from 'events'
+import Service from '../utils/baseClass/Service'
 
-export default class Article extends EventEmitter {
+export class Service1 extends EventEmitter {
+  constructor() {
+    super()
+  }
+}
+
+export default class Article extends Service {
   private _info?: ArticleInfo
   private _content?: string
 
@@ -29,21 +35,21 @@ export default class Article extends EventEmitter {
     if (!this.info || !this.content) throw new Error('数据不完整，添加失败')
 
     const detail: ArticleDetail = { ...this.info, content: this.content }
-    await artileDAO.add(detail)
+    await this.dao.article.add(detail)
   }
 
   public static async remove(id: string) {
-    await artileDAO.remove(id)
+    await this.dao.article.remove(id)
   }
 
   public static async getContent(id: string) {
-    const content = await artileDAO.getContent(id)
+    const content = await this.dao.article.getContent(id)
     if (content) return content
   }
 
   public static async find({ sort, id }: { sort?: string; id?: string }) {
-    if (sort) return await artileDAO.findBySort(sort)
+    if (sort) return await this.dao.article.findBySort(sort)
     // 考虑到 number 0
-    if (id != null) return await artileDAO.findById(id)
+    if (id != null) return await this.dao.article.findById(id)
   }
 }

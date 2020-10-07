@@ -1,10 +1,9 @@
-import * as userDAO from '../dao/user'
+import Service from '../utils/baseClass/Service'
 import Article from './Article'
 import { Profile } from '../utils/type'
-import { EventEmitter } from 'events'
 import * as is from '../utils/is'
 
-export default class User extends EventEmitter {
+export default class User extends Service {
   private _username?: string
   private _password?: string
   private _profile?: Profile
@@ -79,7 +78,7 @@ export default class User extends EventEmitter {
     if (await User.find({ username })) throw new Error('用户已存在')
     if (!is.object(profile)) return
 
-    await userDAO.create(username, password, profile)
+    await this.dao.user.create(username, password, profile)
     this.setUserInfo(username, password, profile)
   }
 
@@ -87,18 +86,18 @@ export default class User extends EventEmitter {
     const result = await User.find({ username })
     if (!result) throw new Error('用户不存在')
 
-    await userDAO.signIn(username, password)
+    await this.dao.user.signIn(username, password)
     this.setUserInfo(username, password, result.profile)
   }
 
   public static async signOut(userId: string) {
     if (!(await User.find({ userId }))) throw new Error('用户不存在')
 
-    await userDAO.signOut(userId)
+    await this.dao.user.signOut(userId)
   }
 
   public static async find({ username, userId }: { username?: string; userId?: string }) {
-    if (username) return await userDAO.findByName(username)
-    if (userId) return await userDAO.findById(userId)
+    if (username) return await this.dao.user.findByName(username)
+    if (userId) return await this.dao.user.findById(userId)
   }
 }

@@ -1,5 +1,5 @@
 import { formData, middlewaresAll, prefix, summary, tagsAll } from 'koa-swagger-decorator'
-import { Controller } from '../utils/baseClass'
+import Controller from '../utils/baseClass/Controller'
 import { post } from '../utils/requestMapping'
 import { busboy } from '../middlewares'
 import { RespMsg } from '../utils/enums'
@@ -32,12 +32,12 @@ export default class FileController extends Controller {
       request
     } = this.ctx
 
-    const pipeFile = async (file: File) => {
+    const pipeFile = async (file: File): Promise<string> => {
       // 文件命名规则: 用户ID_uuid.文件类型
-      const filename = `${userId}_${uuid()}.${getSuffixName(file.filename)}`
-      const savedPath = path.join(process.cwd(), 'static/images', filename)
+      const filename: string = `${userId}_${uuid()}.${getSuffixName(file.filename)}`
+      const savedPath: string = path.join(process.cwd(), 'static/images', filename)
       await promisify(stream.pipeline)(file, fs.createWriteStream(savedPath))
-      const imgUrl = request.origin + '/' + path.join('images', filename)
+      const imgUrl: string = request.origin + '/' + path.join('images', filename)
       return imgUrl
     }
     const results: string[] = await Promise.all(files.map(pipeFile))

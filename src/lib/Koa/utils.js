@@ -27,7 +27,7 @@ export function koaCompose(...middlewares) {
 
 // 对象属性委托
 export class Delegation {
-  constructor(opts = {}) {
+  public constructor(opts = {}) {
     this.opts = opts
   }
 
