@@ -3,7 +3,7 @@ import path from 'path'
 
 const router = new SwaggerRouter()
 
-// swagger docs avaliable at http://localhost:3000/swagger-html
+// swagger docs avaliable at http://localhost:10086/swagger-html
 router.swagger()
 router.mapDir(path.resolve(__dirname, './controllers/'))
 

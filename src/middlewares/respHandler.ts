@@ -15,7 +15,7 @@ export default function responseHandle() {
     try {
       await next()
     } catch (err) {
-      const code = err.statusCode ?? 500
+      const code: number = err.statusCode ?? 500
       ctx.status = code
       ctx.body = {
         payload: { code },

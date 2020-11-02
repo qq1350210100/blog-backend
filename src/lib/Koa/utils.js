@@ -10,7 +10,7 @@ export function koaCompose(...middlewares) {
   return ctx => {
     let count = 0
     function dispatch(i) {
-      if (count > i) throw new Error('next() 在中间件中被调用超过1次')
+      if (count > i) throw 'next() 在中间件中被调用超过1次'
       count = i + 1
       const fn = i < middlewares.length && middlewares[i]
       if (!fn) return Promise.resolve()
@@ -27,7 +27,7 @@ export function koaCompose(...middlewares) {
 
 // 对象属性委托
 export class Delegation {
-  public constructor(opts = {}) {
+  constructor(opts = {}) {
     this.opts = opts
   }
 

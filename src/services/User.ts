@@ -43,9 +43,9 @@ export default class User extends Service {
   }
 
   public async addArticle(article: Article) {
-    if (!article.info || !this.profile?.nickname) return
+    if (!article.info || !this.username) return
 
-    article.info.author = this.profile.nickname
+    article.info.author = this.username
     await article.add()
     this.aritlceList.push(article)
   }
@@ -65,7 +65,7 @@ export default class User extends Service {
 
   public async initById(userId: string) {
     const result = await User.find({ userId })
-    if (!result) throw new Error('用户不存在')
+    if (!result) throw '用户不存在'
 
     const {
       account: { username, password },
@@ -75,7 +75,7 @@ export default class User extends Service {
   }
 
   public async register(username: string, password: string, profile: Profile) {
-    if (await User.find({ username })) throw new Error('用户已存在')
+    if (await User.find({ username })) throw '用户已存在'
     if (!is.object(profile)) return
 
     await this.dao.user.create(username, password, profile)
@@ -84,14 +84,14 @@ export default class User extends Service {
 
   public async signIn(username: string, password: string) {
     const result = await User.find({ username })
-    if (!result) throw new Error('用户不存在')
+    if (!result) throw '用户不存在'
 
     await this.dao.user.signIn(username, password)
     this.setUserInfo(username, password, result.profile)
   }
 
   public static async signOut(userId: string) {
-    if (!(await User.find({ userId }))) throw new Error('用户不存在')
+    if (!(await User.find({ userId }))) throw '用户不存在'
 
     await this.dao.user.signOut(userId)
   }

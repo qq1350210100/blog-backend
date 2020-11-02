@@ -16,8 +16,7 @@ async function _find(whereSql: string) {
   `
   try {
     const results = (await db.query(sql)) as ArticleInfo[]
-    if (results.length)
-      return results.map(article => ({ ...article, tags: convertTags(article.tags) }))
+    return results.map(article => ({ ...article, tags: convertTags(article.tags) }))
   } catch (err) {
     throwSqlError(err)
   }

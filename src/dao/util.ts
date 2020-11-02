@@ -2,7 +2,7 @@ import { Tags } from '../utils/type'
 import { WhereKey } from '../utils/enums'
 
 export function throwSqlError(err: Error) {
-  throw new Error(`SQL执行失败, ${err}`)
+  throw `SQL执行失败, ${err}`
 }
 
 export function convertTags(tags: Tags) {
@@ -16,6 +16,6 @@ export function where(key: WhereKey, value: string): string {
     case WhereKey.USER_ID:
       return `WHERE id = ${value}`
     default:
-      throw new Error(`${key} is not found`)
+      throw `${key} is not found`
   }
 }

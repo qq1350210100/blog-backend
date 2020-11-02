@@ -1,4 +1,4 @@
-import { formData, middlewaresAll, prefix, summary, tagsAll } from 'koa-swagger-decorator'
+import { formData, middlewaresAll, prefix, query, summary, tagsAll } from 'koa-swagger-decorator'
 import Controller from '../utils/baseClass/Controller'
 import { post } from '../utils/requestMapping'
 import { busboy } from '../middlewares'
@@ -26,11 +26,8 @@ export default class FileController extends Controller {
     image: { type: Object, required: true, example: {} }
   })
   async uploadImage() {
-    const {
-      fields: { userId },
-      files,
-      request
-    } = this.ctx
+    const { fields, files, request } = this.ctx
+    const { userId = 'anonymous' }: { userId: string } = fields
 
     const pipeFile = async (file: File): Promise<string> => {
       // 文件命名规则: 用户ID_uuid.文件类型
@@ -40,7 +37,9 @@ export default class FileController extends Controller {
       const imgUrl: string = request.origin + '/' + path.join('images', filename)
       return imgUrl
     }
-    const results: string[] = await Promise.all(files.map(pipeFile))
-    this.ctx.resp(results, RespMsg.OK, 200)
+
+    const urls: string[] = await Promise.all(files.map(pipeFile))
+    const result: string | string[] = files.length > 1 ? urls : urls[0]
+    this.ctx.resp(result, RespMsg.OK, 200)
   }
 }

@@ -32,7 +32,7 @@ export default class Article extends Service {
   }
 
   public async add() {
-    if (!this.info || !this.content) throw new Error('数据不完整，添加失败')
+    if (!this.info || !this.content) throw '数据不完整，添加失败'
 
     const detail: ArticleDetail = { ...this.info, content: this.content }
     await this.dao.article.add(detail)

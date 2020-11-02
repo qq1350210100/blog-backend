@@ -72,7 +72,7 @@ export async function create(username: string, password: string, profile: Profil
 export async function signIn(username: string, password: string) {
   const whereSql = where(WhereKey.USERNAME, username)
   const passed: boolean = await _validate(password, whereSql)
-  if (!passed) throw new Error('账号或密码错误')
+  if (!passed) throw '账号或密码错误'
 
   await _updateOnline(true, whereSql)
 }

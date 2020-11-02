@@ -16,7 +16,7 @@ export default class ArticleController extends Controller {
   public async list() {
     const { sort = 'all' }: { sort: string } = this.ctx.query
     const aritcles = await this.service.Article.find({ sort })
-    this.ctx.resp({ aritcles }, RespMsg.OK, 200)
+    this.ctx.resp(aritcles, RespMsg.OK, 200)
   }
 
   @get('/detail')
@@ -29,9 +29,12 @@ export default class ArticleController extends Controller {
     const results = await this.service.Article.find({ id: articleId })
     const content = await this.service.Article.getContent(articleId)
 
-    if (!results || !results.length || !content) this.ctx.resp({}, RespMsg.FAIL, 200)
+    if (!results || !results.length || !content) {
+      this.ctx.resp({}, RespMsg.FAIL, 200)
+      return
+    }
 
-    const detail = results?.length === 1 ? results[0] : {}
+    const detail = results[0]
     this.ctx.resp({ ...detail, content }, RespMsg.OK, 200)
   }
 

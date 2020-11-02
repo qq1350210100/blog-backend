@@ -1,5 +1,5 @@
 import Controller from '../utils/baseClass/Controller'
-import { prefix, summary, body, tagsAll } from 'koa-swagger-decorator'
+import { prefix, summary, body, tagsAll, query } from 'koa-swagger-decorator'
 import { get, post } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
 
@@ -7,8 +7,8 @@ import { RespMsg } from '../utils/enums'
 @tagsAll(['User'])
 export default class UserController extends Controller {
   @get('/sign_status')
-  @summary('fetch user sign status')
-  public async signStatus() {
+  @summary('fetch user sign status and profile')
+  public async getSignStatus() {
     const { session } = this.ctx
     if (session?.userId) {
       const userId = session.userId
@@ -22,7 +22,35 @@ export default class UserController extends Controller {
         return
       }
     }
-    this.ctx.resp({}, '未登陆', 200)
+    this.ctx.resp({}, '用户未登录', 200)
+  }
+
+  @get('/profile')
+  @summary('fetch user profile')
+  @query({
+    username: { type: String, required: true, example: 'string' }
+  })
+  public async getProfile() {
+    const { username } = this.ctx.query
+    const res = await this.service.User.find({ username })
+    if (res?.profile) {
+      this.ctx.resp({ ...res.profile, username }, RespMsg.OK, 200)
+    } else {
+      this.ctx.resp({}, '用户不存在', 200)
+    }
+  }
+
+  @post('/save_profile')
+  @summary('save user profile')
+  @body({
+    gender: { type: Boolean, required: true, example: 'string' },
+    selfIntroduction: { type: String, required: false, example: 'string' }
+  })
+  public async saveProfile() {
+    const userId = this.ctx.session && this.ctx.session.userId
+    if (userId) {
+    }
+    this.ctx.resp({}, RespMsg.OK, 200)
   }
 
   @post('/sign_in')
@@ -53,7 +81,7 @@ export default class UserController extends Controller {
   @body({
     username: { type: String, required: true, example: 'string' },
     password: { type: String, required: true, example: 'string' },
-    profile: { type: Object, required: false, example: { nickname: 'tom' } }
+    profile: { type: Object, required: false, example: { nickname: 'string' } }
   })
   public async register() {
     const { username, password, profile = {} } = this.ctx.request.body
@@ -78,7 +106,7 @@ export default class UserController extends Controller {
       this.ctx.session = null
       this.ctx.resp({}, RespMsg.OK, 200)
     } else {
-      this.ctx.resp({}, '未登陆', 200)
+      this.ctx.resp({}, '用户未登录', 200)
     }
   }
 }
