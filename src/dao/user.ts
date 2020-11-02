@@ -45,7 +45,8 @@ async function _validate(password: string, whereSql: string) {
   const sql = /*sql*/ `SELECT password FROM user ${whereSql};`
   try {
     const results = (await db.query(sql)) as { password: string }[]
-    if (results.length) return results[0].password === password
+    if (!results.length) return false
+    return results[0].password === password
   } catch (err) {
     throwSqlError(err)
   }
@@ -59,6 +60,8 @@ export async function create(username: string, password: string, profile: Profil
       password = "${password}",
       nickname = "${profile.nickname}",
       avatar = "${profile.avatar}",
+      gender = "${profile.gender}",
+      self_introduction = "${profile.selfIntroduction}",
       level = "${profile.level}",
       is_online = "${profile.isOnline}";
   `

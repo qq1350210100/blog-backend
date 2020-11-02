@@ -18,7 +18,7 @@ export default function responseHandle() {
       const code: number = err.statusCode ?? 500
       ctx.status = code
       ctx.body = {
-        payload: { code },
+        payload: {},
         message: err.message ?? RespMsg.FAIL
       }
     }

@@ -34,7 +34,8 @@ export async function getContent(articleId: string) {
   const sql = /*sql*/ `SELECT content FROM article WHERE id = ${articleId};`
   try {
     const results = (await db.query(sql)) as { content: string }[]
-    if (results.length) return results[0].content
+    if (!results.length) return
+    return results[0].content
   } catch (err) {
     throwSqlError(err)
   }

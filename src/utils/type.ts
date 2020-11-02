@@ -13,6 +13,8 @@ export type Profile = Partial<{
   userId: string
   nickname: string
   avatar: string
+  gender: string
+  selfIntroduction: string
   level: number
   isOnline: boolean
 }>
@@ -34,4 +36,12 @@ export type ArticleDetail = ArticleInfo & { content: string }
 
 export interface File extends ReadStream {
   filename: string
+}
+
+export type UserSetting = {
+  drawerDefaultOpened: boolean
+  menuDefaultExpansion: boolean
+  lang: string
+  useMarkdownGuide: boolean
+  theme: string
 }

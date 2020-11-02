@@ -1,26 +1,30 @@
 import Controller from '../utils/baseClass/Controller'
-import { prefix, summary, body, tagsAll, query } from 'koa-swagger-decorator'
+import { prefix, summary, body, tagsAll, query, middlewares } from 'koa-swagger-decorator'
 import { get, post } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
+import authorization from '../middlewares/auth'
+import { convertToBoolean } from '../utils'
 
 @prefix('/user')
 @tagsAll(['User'])
 export default class UserController extends Controller {
-  @get('/sign_status')
-  @summary('fetch user sign status and profile')
+  @get('/init_data')
+  @summary('init user data, include accout,profile and setting')
+  @middlewares([authorization()])
   public async getSignStatus() {
-    const { session } = this.ctx
-    if (session?.userId) {
-      const userId = session.userId
-      const userInfo = await this.service.User.find({ userId })
-      if (userInfo) {
-        const result = {
-          ...userInfo.profile,
-          username: userInfo.account.username
-        }
-        this.ctx.resp(result, RespMsg.OK, 200)
-        return
+    const { userId } = this.ctx
+    const userInfo = await this.service.User.find({ userId })
+    const setting = new this.service.Setting(userId)
+    const userSetting = await setting.get()
+
+    if (userInfo && userSetting) {
+      const result = {
+        ...convertToBoolean(userInfo.account),
+        ...convertToBoolean(userInfo.profile),
+        setting: convertToBoolean(userSetting)
       }
+      this.ctx.resp(result, RespMsg.OK, 200)
+      return
     }
     this.ctx.resp({}, '用户未登录', 200)
   }
@@ -34,7 +38,7 @@ export default class UserController extends Controller {
     const { username } = this.ctx.query
     const res = await this.service.User.find({ username })
     if (res?.profile) {
-      this.ctx.resp({ ...res.profile, username }, RespMsg.OK, 200)
+      this.ctx.resp({ ...convertToBoolean(res.profile), username }, RespMsg.OK, 200)
     } else {
       this.ctx.resp({}, '用户不存在', 200)
     }
@@ -46,9 +50,13 @@ export default class UserController extends Controller {
     gender: { type: Boolean, required: true, example: 'string' },
     selfIntroduction: { type: String, required: false, example: 'string' }
   })
+  @middlewares([authorization()])
   public async saveProfile() {
-    const userId = this.ctx.session && this.ctx.session.userId
-    if (userId) {
+    const { userId } = this.ctx
+    const result = await this.service.User.find({ userId })
+    if (!result) {
+      this.ctx.resp({}, '用户不存在', 200)
+      return
     }
     this.ctx.resp({}, RespMsg.OK, 200)
   }
@@ -100,13 +108,15 @@ export default class UserController extends Controller {
 
   @post('/sign_out')
   @summary('user account sign out')
+  @middlewares([authorization()])
   public async signOut() {
-    if (this.ctx.session && this.ctx.session.userId) {
-      await this.service.User.signOut(this.ctx.session.userId)
-      this.ctx.session = null
-      this.ctx.resp({}, RespMsg.OK, 200)
-    } else {
+    const { userId } = this.ctx
+    if (!userId) {
       this.ctx.resp({}, '用户未登录', 200)
+      return
     }
+    await this.service.User.signOut(userId)
+    this.ctx.session = null
+    this.ctx.resp({}, RespMsg.OK, 200)
   }
 }

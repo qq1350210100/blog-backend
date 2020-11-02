@@ -25,7 +25,7 @@ export default class FileController extends Controller {
     userId: { type: String, required: true, example: 'string' },
     image: { type: Object, required: true, example: {} }
   })
-  async uploadImage() {
+  public async uploadImage() {
     const { fields, files, request } = this.ctx
     const { userId = 'anonymous' }: { userId: string } = fields
 

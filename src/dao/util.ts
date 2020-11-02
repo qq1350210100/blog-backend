@@ -5,6 +5,10 @@ export function throwSqlError(err: Error) {
   throw `SQL执行失败, ${err}`
 }
 
+export function throwNoResult() {
+  throw `查询结果为空`
+}
+
 export function convertTags(tags: Tags) {
   return typeof tags === 'string' ? tags.split(',') : []
 }

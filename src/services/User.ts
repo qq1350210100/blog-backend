@@ -2,6 +2,7 @@ import Service from '../utils/baseClass/Service'
 import Article from './Article'
 import { Profile } from '../utils/type'
 import * as is from '../utils/is'
+import { Setting } from '.'
 
 export default class User extends Service {
   private _username?: string
@@ -75,11 +76,20 @@ export default class User extends Service {
   }
 
   public async register(username: string, password: string, profile: Profile) {
+    console.log('username: ', username)
     if (await User.find({ username })) throw '用户已存在'
-    if (!is.object(profile)) return
+    if (!is.object(profile)) throw '资料不全，注册失败'
 
     await this.dao.user.create(username, password, profile)
     this.setUserInfo(username, password, profile)
+
+    // 初始化用户设置
+    const result = await User.find({ username })
+    if (result?.profile?.userId) {
+      const { userId } = result.profile
+      const setting = new Setting(userId)
+      await setting.add()
+    }
   }
 
   public async signIn(username: string, password: string) {
