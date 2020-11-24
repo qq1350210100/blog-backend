@@ -15,7 +15,6 @@ export async function update(userId: string, setting: UserSetting) {
   const sql = /*sql*/ `
     UPDATE setting SET
       drawer_default_opened = ${setting.drawerDefaultOpened},
-      menu_default_expansion = ${setting.menuDefaultExpansion},
       use_markdown_guide = ${setting.useMarkdownGuide},
       lang = "${setting.lang}",
       theme = "${setting.theme}"
@@ -32,7 +31,6 @@ export async function find(userId: string) {
   const sql = /*sql*/ `
     SELECT 
     drawer_default_opened as drawerDefaultOpened,
-    menu_default_expansion as menuDefaultExpansion,
     use_markdown_guide as useMarkdownGuide,
     lang as lang,
     theme as theme

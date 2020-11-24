@@ -5,6 +5,7 @@ import * as is from '../utils/is'
 import { Setting } from '.'
 
 export default class User extends Service {
+  private _userId?: string
   private _username?: string
   private _password?: string
   private _profile?: Profile
@@ -15,6 +16,13 @@ export default class User extends Service {
   }
   public set password(value) {
     this._password = value
+  }
+
+  public get userId() {
+    return this._userId
+  }
+  public set userId(value) {
+    this._userId = value
   }
 
   public get username() {
@@ -58,7 +66,8 @@ export default class User extends Service {
       .filter(Boolean) as Article[]
   }
 
-  private setUserInfo(username: string, password: string, profile: Profile) {
+  private setUserInfo(userId: string, username: string, password: string, profile: Profile) {
+    this.userId = userId
     this.username = username
     this.password = password
     this.profile = profile
@@ -72,7 +81,7 @@ export default class User extends Service {
       account: { username, password },
       profile
     } = result
-    this.setUserInfo(username, password, profile)
+    this.setUserInfo(userId, username, password, profile)
   }
 
   public async register(username: string, password: string, profile: Profile) {
@@ -81,7 +90,6 @@ export default class User extends Service {
     if (!is.object(profile)) throw '资料不全，注册失败'
 
     await this.dao.user.create(username, password, profile)
-    this.setUserInfo(username, password, profile)
 
     // 初始化用户设置
     const result = await User.find({ username })
@@ -89,6 +97,9 @@ export default class User extends Service {
       const { userId } = result.profile
       const setting = new Setting(userId)
       await setting.add()
+      this.setUserInfo(userId, username, password, profile)
+    } else {
+      throw '注册失败'
     }
   }
 
@@ -97,7 +108,19 @@ export default class User extends Service {
     if (!result) throw '用户不存在'
 
     await this.dao.user.signIn(username, password)
-    this.setUserInfo(username, password, result.profile)
+    const userId = result.profile.userId
+    if (userId) {
+      this.setUserInfo(userId, username, password, result.profile)
+    }
+  }
+
+  public async updateProfile(profile: Profile) {
+    const newProfile = { ...this.profile, ...profile }
+
+    if (!this.userId) {
+      throw 'userId 不存在'
+    }
+    this.dao.user.setProfile(this.userId, newProfile)
   }
 
   public static async signOut(userId: string) {

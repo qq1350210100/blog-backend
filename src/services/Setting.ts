@@ -19,13 +19,6 @@ export default class Setting extends Service {
   public set lang(value: string) {
     this._language = value
   }
-  private _menuExpansion: boolean
-  public get menuDefaultExpansion(): boolean {
-    return this._menuExpansion
-  }
-  public set menuDefaultExpansion(value: boolean) {
-    this._menuExpansion = value
-  }
   private _drawerOpened: boolean
   public get drawerDefaultOpened(): boolean {
     return this._drawerOpened
@@ -52,18 +45,16 @@ export default class Setting extends Service {
     this._theme = 'primary'
     this._language = 'zh-CN'
     this._drawerOpened = false
-    this._menuExpansion = false
     this._useMarkdownGuide = true
   }
 
   private _setSetting(setting: UserSetting) {
     if (!setting) return
 
-    this.theme = setting.theme
-    this.lang = setting.lang
-    this.drawerDefaultOpened = setting.drawerDefaultOpened
-    this.menuDefaultExpansion = setting.menuDefaultExpansion
-    this.useMarkdownGuide = setting.useMarkdownGuide
+    this.theme = setting.theme || this.theme
+    this.lang = setting.lang || this.lang
+    this.drawerDefaultOpened = setting.drawerDefaultOpened || this.drawerDefaultOpened
+    this.useMarkdownGuide = setting.useMarkdownGuide || this.useMarkdownGuide
   }
 
   public async get() {
@@ -82,7 +73,7 @@ export default class Setting extends Service {
   }
 
   public async update(setting: UserSetting) {
-    await this._setSetting(setting)
+    this._setSetting(setting)
     await this.dao.setting.update(this.userId, setting)
   }
 }

@@ -47,17 +47,25 @@ export default class UserController extends Controller {
   @post('/save_profile')
   @summary('save user profile')
   @body({
-    gender: { type: Boolean, required: true, example: 'string' },
+    avatar: { type: String, required: false, example: 'string' },
+    level: { type: String, required: false, example: 'string' },
+    gender: { type: String, required: false, example: 'string' },
+    nickname: { type: String, required: false, example: 'string' },
     selfIntroduction: { type: String, required: false, example: 'string' }
   })
   @middlewares([authorization()])
   public async saveProfile() {
     const { userId } = this.ctx
+    const profile = this.ctx.request.body
     const result = await this.service.User.find({ userId })
     if (!result) {
       this.ctx.resp({}, '用户不存在', 200)
       return
     }
+    const user = new this.service.User()
+    await user.initById(userId)
+    await user.updateProfile(profile)
+
     this.ctx.resp({}, RespMsg.OK, 200)
   }
 

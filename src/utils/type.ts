@@ -40,7 +40,6 @@ export interface File extends ReadStream {
 
 export type UserSetting = {
   drawerDefaultOpened: boolean
-  menuDefaultExpansion: boolean
   lang: string
   useMarkdownGuide: boolean
   theme: string

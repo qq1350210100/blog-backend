@@ -20,25 +20,23 @@ export default class SettingController extends Controller {
   @post('/update')
   @summary('upload user setting')
   @body({
-    drawerDefaultOpened: { type: Boolean, required: true, example: false },
-    menuDefaultExpansion: { type: Boolean, required: true, example: false },
-    lang: { type: String, required: true, example: 'string' },
-    useMarkdownGuide: { type: Boolean, required: true, example: false },
-    theme: { type: String, required: true, example: 'string' }
+    drawerDefaultOpened: { type: Boolean, required: false, example: false },
+    lang: { type: String, required: false, example: 'string' },
+    useMarkdownGuide: { type: Boolean, required: false, example: false },
+    theme: { type: String, required: false, example: 'string' }
   })
   @middlewares([authorization()])
   public async updateSetting() {
     const {
       userId,
       request: {
-        body: { drawerDefaultOpened, menuDefaultExpansion, lang, useMarkdownGuide, theme }
+        body: { drawerDefaultOpened, lang, useMarkdownGuide, theme }
       }
     } = this.ctx
     const setting = new this.service.Setting(userId)
     try {
       await setting.update({
         drawerDefaultOpened,
-        menuDefaultExpansion,
         lang,
         useMarkdownGuide,
         theme

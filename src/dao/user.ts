@@ -20,6 +20,8 @@ async function _find(whereSql: string) {
       id AS userId,
       nickname,
       avatar,
+      gender,
+      self_introduction AS selfIntroduction,
       level,
       is_online AS isOnline
     FROM user ${whereSql};
@@ -90,4 +92,19 @@ export function findById(userId: string) {
 
 export function findByName(username: string) {
   return _find(where(WhereKey.USERNAME, username))
+}
+
+export async function setProfile(userId: string, profile: Profile) {
+  const sql = /*sql*/ `
+    UPDATE user SET
+      nickname = "${profile.nickname}",
+      avatar = "${profile.avatar}",
+      gender = "${profile.gender}",
+      self_introduction = "${profile.selfIntroduction}",
+      level = "${profile.level}"
+      WHERE id = "${userId}";
+  `
+  try {
+    await db.query(sql)
+  } catch (err) {}
 }

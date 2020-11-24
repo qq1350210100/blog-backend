@@ -45,13 +45,13 @@ export async function add(detail: ArticleDetail) {
   const tagsStr = Array.isArray(detail.tags) ? detail.tags.join(',') : ''
   const sql = /*sql*/ `
     INSERT INTO article SET 
-      background_image = '${detail.backgroundImage}',
-      title = '${detail.title}',
-      introduce = '${detail.introduce}',
-      content = '${detail.content}',
-      author = '${detail.author}',
-      sort = '${detail.sort}',
-      tags = '${tagsStr}';
+      background_image = "${detail.backgroundImage}",
+      title = "${detail.title}",
+      introduce = "${detail.introduce}",
+      content = "${detail.content}",
+      author = "${detail.author}",
+      sort = "${detail.sort}",
+      tags = "${tagsStr}";
   `
   try {
     await db.query(sql)
