@@ -12,7 +12,7 @@ export default function authorization() {
       const { userId } = ctx.session
       try {
         await User.find({ userId })
-        ctx.userId = userId
+        ctx.userId = Number(userId)
         try {
           await next()
         } catch (err) {

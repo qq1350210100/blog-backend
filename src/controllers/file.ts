@@ -22,16 +22,18 @@ export default class FileController extends Controller {
   @post('/upload_image')
   @summary('upload image to static path')
   @formData({
-    userId: { type: String, required: true, example: 'string' },
+    userId: { type: Number, required: true, example: 1 },
     image: { type: Object, required: true, example: {} }
   })
   public async uploadImage() {
     const { fields, files, request } = this.ctx
-    const { userId = 'anonymous' }: { userId: string } = fields
+    const { userId }: { userId: number } = fields
 
     const pipeFile = async (file: File): Promise<string> => {
       // 文件命名规则: 用户ID_uuid.文件类型
-      const filename: string = `${userId}_${uuid()}.${getSuffixName(file.filename)}`
+      const filename: string = `${userId ? userId : 'anonymous'}_${uuid()}.${getSuffixName(
+        file.filename
+      )}`
       const savedPath: string = path.join(process.cwd(), 'static/images', filename)
       await promisify(stream.pipeline)(file, fs.createWriteStream(savedPath))
       const imgUrl: string = request.origin + '/' + path.join('images', filename)

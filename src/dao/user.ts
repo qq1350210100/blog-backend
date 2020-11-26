@@ -82,11 +82,11 @@ export async function signIn(username: string, password: string) {
   await _updateOnline(true, whereSql)
 }
 
-export async function signOut(userId: string) {
+export async function signOut(userId: number) {
   await _updateOnline(false, where(WhereKey.USER_ID, userId))
 }
 
-export function findById(userId: string) {
+export function findById(userId: number) {
   return _find(where(WhereKey.USER_ID, userId))
 }
 
@@ -94,7 +94,7 @@ export function findByName(username: string) {
   return _find(where(WhereKey.USERNAME, username))
 }
 
-export async function setProfile(userId: string, profile: Profile) {
+export async function setProfile(userId: number, profile: Profile) {
   const sql = /*sql*/ `
     UPDATE user SET
       nickname = "${profile.nickname}",

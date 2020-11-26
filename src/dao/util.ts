@@ -9,11 +9,11 @@ export function throwNoResult() {
   throw `查询结果为空`
 }
 
-export function stringToArray(string: StrArray) {
-  return string && typeof string === 'string' ? string.split(',') : []
+export function stringToArray(string: StrArray): number[] {
+  return string && typeof string === 'string' ? string.split(',').map(Number) : []
 }
 
-export function where(key: WhereKey, value: string): string {
+export function where(key: WhereKey, value: string | number): string {
   switch (key) {
     case WhereKey.USERNAME:
       return `WHERE username = "${value}"`

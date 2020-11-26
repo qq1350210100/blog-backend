@@ -11,8 +11,8 @@ export class Service1 extends EventEmitter {
 export default class Article extends Service {
   private _info?: ArticleInfo
   private _content?: string
-  private _id?: string
-  private _likeList?: string[]
+  private _id?: number
+  private _likeList?: number[]
 
   public get id() {
     return this._id
@@ -57,7 +57,7 @@ export default class Article extends Service {
     await this.dao.article.add(detail)
   }
 
-  public async init(id: string) {
+  public async init(id: number) {
     const results = await Article.find({ id })
     if (!results?.length) {
       throw '找不到该文章'
@@ -68,16 +68,16 @@ export default class Article extends Service {
     this.likeList = info.likes
   }
 
-  public static async remove(id: string) {
+  public static async remove(id: number) {
     await this.dao.article.remove(id)
   }
 
-  public static async getContent(id: string) {
+  public static async getContent(id: number) {
     const content = await this.dao.article.getContent(id)
     if (content) return content
   }
 
-  public static async find({ sort, id }: { sort?: string; id?: string }) {
+  public static async find({ sort, id }: { sort?: string; id?: number }) {
     if (sort) return await this.dao.article.findBySort(sort)
     // 考虑到 number 0
     if (id != null) return await this.dao.article.findById(id)
@@ -94,10 +94,9 @@ export default class Article extends Service {
     }
   }
 
-  public async addLikesMember(userId: string) {
+  public async addLikesMember(userId: number) {
     this.likeList = Array.isArray(this.likeList) ? this.likeList : []
-    const hadExist: boolean =
-      this.likeList.some(item => item?.toString?.() === userId?.toString?.()) || false
+    const hadExist: boolean = this.likeList.some(item => item === userId) || false
     if (hadExist) {
       throw '已经点赞过了'
     }
@@ -108,10 +107,9 @@ export default class Article extends Service {
     }
   }
 
-  public async removeLikesMember(userId: string) {
+  public async removeLikesMember(userId: number) {
     this.likeList = Array.isArray(this.likeList) ? this.likeList : []
-    const hadExist: boolean =
-      this.likeList.some(item => item?.toString?.() === userId?.toString?.()) || false
+    const hadExist: boolean = this.likeList.some(item => item === userId) || false
     if (!hadExist) return
 
     if (this.id) {

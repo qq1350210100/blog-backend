@@ -4,7 +4,7 @@ import { UserSetting } from '../utils/type'
 import User from './User'
 
 export default class Setting extends Service {
-  private _userId: string
+  private _userId: number
   private _theme: string
   public get theme(): string {
     return this._theme
@@ -33,13 +33,13 @@ export default class Setting extends Service {
   public set useMarkdownGuide(value: boolean) {
     this._useMarkdownGuide = value
   }
-  public get userId(): string {
+  public get userId(): number {
     return this._userId
   }
-  public set userId(value: string) {
+  public set userId(value: number) {
     this._userId = value
   }
-  constructor(userId: string) {
+  constructor(userId: number) {
     super()
     this._userId = userId
     this._theme = 'primary'

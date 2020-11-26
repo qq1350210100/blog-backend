@@ -5,7 +5,7 @@ import * as is from '../utils/is'
 import { Setting } from '.'
 
 export default class User extends Service {
-  private _userId?: string
+  private _userId?: number
   private _username?: string
   private _password?: string
   private _profile?: Profile
@@ -59,21 +59,21 @@ export default class User extends Service {
     this.aritlceList.push(article)
   }
 
-  public async removeArticle(articleId: string) {
+  public async removeArticle(articleId: number) {
     await Article.remove(articleId)
     this.aritlceList = this.aritlceList
       .map(article => (article.info?.articleId === articleId ? false : article))
       .filter(Boolean) as Article[]
   }
 
-  private setUserInfo(userId: string, username: string, password: string, profile: Profile) {
+  private setUserInfo(userId: number, username: string, password: string, profile: Profile) {
     this.userId = userId
     this.username = username
     this.password = password
     this.profile = profile
   }
 
-  public async initById(userId: string) {
+  public async initById(userId: number) {
     const result = await User.find({ userId })
     if (!result) throw '用户不存在'
 
@@ -123,13 +123,13 @@ export default class User extends Service {
     this.dao.user.setProfile(this.userId, newProfile)
   }
 
-  public static async signOut(userId: string) {
+  public static async signOut(userId: number) {
     if (!(await User.find({ userId }))) throw '用户不存在'
 
     await this.dao.user.signOut(userId)
   }
 
-  public static async find({ username, userId }: { username?: string; userId?: string }) {
+  public static async find({ username, userId }: { username?: string; userId?: number }) {
     if (username) return await this.dao.user.findByName(username)
     if (userId) return await this.dao.user.findById(userId)
   }

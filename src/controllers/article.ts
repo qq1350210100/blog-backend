@@ -23,10 +23,11 @@ export default class ArticleController extends Controller {
   @get('/detail')
   @summary('fetch article detail')
   @query({
-    articleId: { type: String, required: true, example: 'string' }
+    articleId: { type: Number, required: true, example: 1 }
   })
   public async detail() {
-    const { articleId }: { articleId: string } = this.ctx.query
+    const body: { articleId: number } = this.ctx.query
+    const articleId = Number(body.articleId)
     const { Article } = this.service
     const results = await Article.find({ id: articleId })
     const content = await Article.getContent(articleId)
@@ -44,17 +45,16 @@ export default class ArticleController extends Controller {
   @summary('add a new acticle')
   @middlewares([auth()])
   @body({
-    userId: { type: String, required: true, example: 'string' },
+    userId: { type: Number, required: true, example: 1 },
     articleDetail: { type: Object, required: true, example: {} }
   })
   public async add() {
-    const {
-      userId,
-      articleDetail
-    }: {
-      userId: string
+    const body: {
+      userId: number
       articleDetail: ArticleDetail
     } = this.ctx.request.body
+    const { articleDetail } = body
+    const userId = Number(body.userId)
     const { Article, User } = this.service
 
     const articleInfo: ArticleInfo = omit({ ...articleDetail }, ['content'])
@@ -71,10 +71,11 @@ export default class ArticleController extends Controller {
   @summary('remove a existing article')
   @middlewares([auth()])
   @body({
-    articleId: { type: String, required: true, example: 'string' }
+    articleId: { type: Number, required: true, example: 1 }
   })
   public async remove() {
-    const { articleId }: { articleId: string } = this.ctx.request.body
+    const body: { articleId: number } = this.ctx.request.body
+    const articleId = Number(body.articleId)
     await this.service.Article.remove(articleId)
     this.ctx.resp({}, RespMsg.OK, 200)
   }
@@ -82,10 +83,11 @@ export default class ArticleController extends Controller {
   @post('/increase_views')
   @summary('article views count increase 1')
   @body({
-    articleId: { type: String, required: true, example: 'string' }
+    articleId: { type: Number, required: true, example: 1 }
   })
   public async increaseViews() {
-    const { articleId }: { articleId: string } = this.ctx.request.body
+    const body: { articleId: number } = this.ctx.request.body
+    const articleId = Number(body.articleId)
     const { Article } = this.service
 
     if (!articleId) return
@@ -104,17 +106,20 @@ export default class ArticleController extends Controller {
   @summary('user likes a article')
   @middlewares([auth()])
   @body({
-    userId: { type: String, required: true, example: 'string' },
-    articleId: { type: String, required: true, example: 'string' }
+    userId: { type: Number, required: true, example: 1 },
+    articleId: { type: Number, required: true, example: 1 }
   })
   public async likes() {
-    const { articleId, userId }: { articleId: string; userId: string } = this.ctx.request.body
+    const body: { articleId: number; userId: number } = this.ctx.request.body
+    const articleId = Number(body.articleId)
+    const userId = Number(body.userId)
+
     const { User, Article } = this.service
     const user = new User()
     await user.initById(userId)
     const artilce = new Article()
     await artilce.init(articleId)
-    await artilce.addLikesMember(userId.toString())
+    await artilce.addLikesMember(userId)
     this.ctx.resp({}, RespMsg.OK, 200)
   }
 
@@ -122,17 +127,20 @@ export default class ArticleController extends Controller {
   @summary('user dislike a article')
   @middlewares([auth()])
   @body({
-    userId: { type: String, required: true, example: 'string' },
-    articleId: { type: String, required: true, example: 'string' }
+    userId: { type: Number, required: true, example: 1 },
+    articleId: { type: Number, required: true, example: 1 }
   })
   public async dislike() {
-    const { articleId, userId }: { articleId: string; userId: string } = this.ctx.request.body
+    const body: { articleId: number; userId: number } = this.ctx.request.body
+    const articleId = Number(body.articleId)
+    const userId = Number(body.userId)
+
     const { User, Article } = this.service
     const user = new User()
     await user.initById(userId)
     const artilce = new Article()
     await artilce.init(articleId)
-    await artilce.removeLikesMember(userId.toString())
+    await artilce.removeLikesMember(userId)
     this.ctx.resp({}, RespMsg.OK, 200)
   }
 }

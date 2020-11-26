@@ -2,7 +2,7 @@ import { db } from '../utils/mysql'
 import { throwSqlError } from './util'
 import { UserSetting } from '../utils/type'
 
-export async function add(userId: string) {
+export async function add(userId: number) {
   const sql = /*sql*/ `INSERT INTO setting SET user_id = ${userId};`
   try {
     await db.query(sql)
@@ -11,7 +11,7 @@ export async function add(userId: string) {
   }
 }
 
-export async function update(userId: string, setting: UserSetting) {
+export async function update(userId: number, setting: UserSetting) {
   const sql = /*sql*/ `
     UPDATE setting SET
       drawer_default_opened = ${setting.drawerDefaultOpened},
@@ -27,7 +27,7 @@ export async function update(userId: string, setting: UserSetting) {
   }
 }
 
-export async function find(userId: string) {
+export async function find(userId: number) {
   const sql = /*sql*/ `
     SELECT 
     drawer_default_opened as drawerDefaultOpened,

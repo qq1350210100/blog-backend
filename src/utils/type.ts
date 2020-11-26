@@ -10,7 +10,7 @@ export type Account = {
 }
 
 export type Profile = Partial<{
-  userId: string
+  userId: number
   nickname: string
   avatar: string
   gender: string
@@ -19,10 +19,10 @@ export type Profile = Partial<{
   isOnline: boolean
 }>
 
-export type StrArray = string[] | string
+export type StrArray = number[] | string
 
 export interface ArticleInfo {
-  articleId: string
+  articleId: number
   introduce: string
   sort: string
   title: string

@@ -32,11 +32,11 @@ export function findBySort(sort: string) {
   return _find(sort === 'all' ? '' : `WHERE sort = "${sort}"`)
 }
 
-export function findById(id: string) {
+export function findById(id: number) {
   return _find(`WHERE id = ${id}`)
 }
 
-export async function getContent(articleId: string) {
+export async function getContent(articleId: number) {
   const sql = /*sql*/ `SELECT content FROM article WHERE id = ${articleId};`
   try {
     const results = (await db.query(sql)) as { content: string }[]
@@ -67,7 +67,7 @@ export async function add(detail: ArticleDetail) {
   }
 }
 
-export async function remove(id: string) {
+export async function remove(id: number) {
   const sql = /*sql*/ `DELETE FROM article WHERE id = ${id};`
   try {
     await db.query(sql)
@@ -76,7 +76,7 @@ export async function remove(id: string) {
   }
 }
 
-export async function increaseViews(articleId: string, newViews: number) {
+export async function increaseViews(articleId: number, newViews: number) {
   const sql = /*sql*/ `UPDATE article SET views = ${newViews} WHERE id = ${articleId};`
   try {
     await db.query(sql)
@@ -85,8 +85,8 @@ export async function increaseViews(articleId: string, newViews: number) {
   }
 }
 
-export async function setLikes(articleId: string, likes: string[]) {
-  const likesStr = likes.join(',')
+export async function setLikes(articleId: number, likes: number[]) {
+  const likesStr: string = likes.join(',')
   const sql = /*sql*/ `UPDATE article SET likes = "${likesStr}" WHERE id = ${articleId};`
   try {
     await db.query(sql)
