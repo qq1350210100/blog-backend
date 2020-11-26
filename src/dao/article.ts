@@ -1,5 +1,5 @@
 import { db } from '../utils/mysql'
-import { throwSqlError, convertTags } from './util'
+import { throwSqlError, stringToArray } from './util'
 import { ArticleInfo, ArticleDetail } from '../utils/type'
 
 async function _find(whereSql: string) {
@@ -12,12 +12,17 @@ async function _find(whereSql: string) {
       background_image AS backgroundImage,
       views,
       tags,
-      creation_time AS creationTime
+      creation_time AS creationTime,
+      likes
     FROM article ${whereSql};
   `
   try {
     const results = (await db.query(sql)) as ArticleInfo[]
-    return results.map(article => ({ ...article, tags: convertTags(article.tags) }))
+    return results.map(article => ({
+      ...article,
+      tags: stringToArray(article.tags),
+      likes: stringToArray(article.likes)
+    }))
   } catch (err) {
     throwSqlError(err)
   }
@@ -73,6 +78,16 @@ export async function remove(id: string) {
 
 export async function increaseViews(articleId: string, newViews: number) {
   const sql = /*sql*/ `UPDATE article SET views = ${newViews} WHERE id = ${articleId};`
+  try {
+    await db.query(sql)
+  } catch (err) {
+    throwSqlError(err)
+  }
+}
+
+export async function setLikes(articleId: string, likes: string[]) {
+  const likesStr = likes.join(',')
+  const sql = /*sql*/ `UPDATE article SET likes = "${likesStr}" WHERE id = ${articleId};`
   try {
     await db.query(sql)
   } catch (err) {

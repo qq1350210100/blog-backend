@@ -13,7 +13,15 @@ export default function authorization() {
       try {
         await User.find({ userId })
         ctx.userId = userId
-        await next()
+        try {
+          await next()
+        } catch (err) {
+          ctx.status = 200
+          ctx.body = {
+            message: err,
+            payload: {}
+          }
+        }
         return
       } catch (err) {
         respBody.message = err

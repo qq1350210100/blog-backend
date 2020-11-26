@@ -19,7 +19,7 @@ export type Profile = Partial<{
   isOnline: boolean
 }>
 
-export type Tags = string | string[]
+export type StrArray = string[] | string
 
 export interface ArticleInfo {
   articleId: string
@@ -28,7 +28,8 @@ export interface ArticleInfo {
   title: string
   author: string
   views: number
-  tags: Tags
+  tags: StrArray
+  likes: StrArray
   backgroundImage: string
   creationTime: number
 }

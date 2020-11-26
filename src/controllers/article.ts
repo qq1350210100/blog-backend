@@ -87,13 +87,52 @@ export default class ArticleController extends Controller {
   public async increaseViews() {
     const { articleId }: { articleId: string } = this.ctx.request.body
     const { Article } = this.service
-    const results = await Article.find({ id: articleId })
-    if (!results?.length) return
 
-    const info = results[0]
-    const article = new Article(info)
-    await article.increaseViews(articleId)
+    if (!articleId) return
 
-    this.ctx.resp({ views: info.views + 1 }, RespMsg.OK, 200)
+    const article = new Article()
+    await article.init(articleId)
+    await article.increaseViews()
+
+    if (!article.info) return
+
+    const views = article.info.views + 1
+    this.ctx.resp({ views }, RespMsg.OK, 200)
+  }
+
+  @post('/likes')
+  @summary('user likes a article')
+  @middlewares([auth()])
+  @body({
+    userId: { type: String, required: true, example: 'string' },
+    articleId: { type: String, required: true, example: 'string' }
+  })
+  public async likes() {
+    const { articleId, userId }: { articleId: string; userId: string } = this.ctx.request.body
+    const { User, Article } = this.service
+    const user = new User()
+    await user.initById(userId)
+    const artilce = new Article()
+    await artilce.init(articleId)
+    await artilce.addLikesMember(userId.toString())
+    this.ctx.resp({}, RespMsg.OK, 200)
+  }
+
+  @post('/dislike')
+  @summary('user dislike a article')
+  @middlewares([auth()])
+  @body({
+    userId: { type: String, required: true, example: 'string' },
+    articleId: { type: String, required: true, example: 'string' }
+  })
+  public async dislike() {
+    const { articleId, userId }: { articleId: string; userId: string } = this.ctx.request.body
+    const { User, Article } = this.service
+    const user = new User()
+    await user.initById(userId)
+    const artilce = new Article()
+    await artilce.init(articleId)
+    await artilce.removeLikesMember(userId.toString())
+    this.ctx.resp({}, RespMsg.OK, 200)
   }
 }

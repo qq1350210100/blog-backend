@@ -1,4 +1,4 @@
-import { Tags } from '../utils/type'
+import { StrArray } from '../utils/type'
 import { WhereKey } from '../utils/enums'
 
 export function throwSqlError(err: Error) {
@@ -9,8 +9,8 @@ export function throwNoResult() {
   throw `查询结果为空`
 }
 
-export function convertTags(tags: Tags) {
-  return typeof tags === 'string' ? tags.split(',') : []
+export function stringToArray(string: StrArray) {
+  return string && typeof string === 'string' ? string.split(',') : []
 }
 
 export function where(key: WhereKey, value: string): string {

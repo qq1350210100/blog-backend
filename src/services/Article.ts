@@ -11,6 +11,15 @@ export class Service1 extends EventEmitter {
 export default class Article extends Service {
   private _info?: ArticleInfo
   private _content?: string
+  private _id?: string
+  private _likeList?: string[]
+
+  public get id() {
+    return this._id
+  }
+  public set id(value) {
+    this._id = value
+  }
 
   public get info() {
     return this._info
@@ -26,16 +35,37 @@ export default class Article extends Service {
     this._content = value
   }
 
-  constructor(info: ArticleInfo) {
+  public get likeList() {
+    return this._likeList
+  }
+  public set likeList(value) {
+    this._likeList = value
+  }
+
+  constructor(info?: ArticleInfo) {
     super()
     this._info = info
+    this._likeList = []
   }
 
   public async add() {
-    if (!this.info || !this.content) throw '数据不完整，添加失败'
+    if (!this.info || !this.content) {
+      throw '数据不完整，添加失败'
+    }
 
     const detail: ArticleDetail = { ...this.info, content: this.content }
     await this.dao.article.add(detail)
+  }
+
+  public async init(id: string) {
+    const results = await Article.find({ id })
+    if (!results?.length) {
+      throw '找不到该文章'
+    }
+    this.id = id
+    const info = results[0]
+    this.info = info
+    this.likeList = info.likes
   }
 
   public static async remove(id: string) {
@@ -53,12 +83,41 @@ export default class Article extends Service {
     if (id != null) return await this.dao.article.findById(id)
   }
 
-  public async increaseViews(articleId: string) {
+  public async increaseViews() {
     if (!this.info) return
 
-    const increment: number = 1
-    const oldViews: number = this.info.views
-    const newViews: number = oldViews + increment
-    await this.dao.article.increaseViews(articleId, newViews)
+    if (this.id) {
+      const increment: number = 1
+      const oldViews: number = this.info.views
+      const newViews: number = oldViews + increment
+      await this.dao.article.increaseViews(this.id, newViews)
+    }
+  }
+
+  public async addLikesMember(userId: string) {
+    this.likeList = Array.isArray(this.likeList) ? this.likeList : []
+    const hadExist: boolean =
+      this.likeList.some(item => item?.toString?.() === userId?.toString?.()) || false
+    if (hadExist) {
+      throw '已经点赞过了'
+    }
+    if (this.id) {
+      const newLikes = [...this.likeList, userId]
+      await this.dao.article.setLikes(this.id, newLikes)
+      this.likeList.push(userId)
+    }
+  }
+
+  public async removeLikesMember(userId: string) {
+    this.likeList = Array.isArray(this.likeList) ? this.likeList : []
+    const hadExist: boolean =
+      this.likeList.some(item => item?.toString?.() === userId?.toString?.()) || false
+    if (!hadExist) return
+
+    if (this.id) {
+      const newLikes = this.likeList.filter(item => item !== userId)
+      await this.dao.article.setLikes(this.id, newLikes)
+      this.likeList = newLikes
+    }
   }
 }
