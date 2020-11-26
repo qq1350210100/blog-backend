@@ -30,6 +30,7 @@ export interface ArticleInfo {
   views: number
   tags: Tags
   backgroundImage: string
+  creationTime: number
 }
 
 export type ArticleDetail = ArticleInfo & { content: string }

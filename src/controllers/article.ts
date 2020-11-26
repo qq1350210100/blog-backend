@@ -30,7 +30,7 @@ export default class ArticleController extends Controller {
     const content = await this.service.Article.getContent(articleId)
 
     if (!results || !results.length || !content) {
-      this.ctx.resp({}, RespMsg.FAIL, 200)
+      this.ctx.resp({}, '未查询到结果', 200)
       return
     }
 
@@ -48,7 +48,10 @@ export default class ArticleController extends Controller {
     const {
       userId,
       articleDetail
-    }: { userId: string; articleDetail: ArticleDetail } = this.ctx.request.body
+    }: {
+      userId: string
+      articleDetail: ArticleDetail
+    } = this.ctx.request.body
 
     const articleInfo: ArticleInfo = omit({ ...articleDetail }, ['content'])
     const article = new this.service.Article(articleInfo)

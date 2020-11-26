@@ -11,7 +11,8 @@ async function _find(whereSql: string) {
       author,
       background_image AS backgroundImage,
       views,
-      tags
+      tags,
+      creation_time AS creationTime
     FROM article ${whereSql};
   `
   try {
@@ -51,7 +52,8 @@ export async function add(detail: ArticleDetail) {
       content = "${detail.content}",
       author = "${detail.author}",
       sort = "${detail.sort}",
-      tags = "${tagsStr}";
+      tags = "${tagsStr}",
+      creation_time = "${detail.creationTime}";
   `
   try {
     await db.query(sql)
