@@ -39,7 +39,7 @@ export default class Setting extends Service {
   public set userId(value: string) {
     this._userId = value
   }
-  public constructor(userId: string) {
+  constructor(userId: string) {
     super()
     this._userId = userId
     this._theme = 'primary'

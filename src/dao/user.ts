@@ -102,7 +102,7 @@ export async function setProfile(userId: string, profile: Profile) {
       gender = "${profile.gender}",
       self_introduction = "${profile.selfIntroduction}",
       level = "${profile.level}"
-      WHERE id = "${userId}";
+      WHERE id = ${userId};
   `
   try {
     await db.query(sql)

@@ -6,7 +6,7 @@ export default class Controller extends EventEmitter {
   ctx: Koa.Context
   app: Koa<Koa.DefaultState, Koa.DefaultContext>
   service: typeof service
-  public constructor(ctx: Koa.Context) {
+  constructor(ctx: Koa.Context) {
     super()
     this.ctx = ctx
     this.app = ctx.app

@@ -2,19 +2,20 @@ import Controller from '../utils/baseClass/Controller'
 import { prefix, summary, body, tagsAll, query, middlewares } from 'koa-swagger-decorator'
 import { get, post } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
-import authorization from '../middlewares/auth'
 import { convertToBoolean } from '../utils'
+import { auth } from '../middlewares'
 
 @prefix('/user')
 @tagsAll(['User'])
 export default class UserController extends Controller {
   @get('/init_data')
   @summary('init user data, include accout,profile and setting')
-  @middlewares([authorization()])
+  @middlewares([auth()])
   public async getSignStatus() {
     const { userId } = this.ctx
-    const userInfo = await this.service.User.find({ userId })
-    const setting = new this.service.Setting(userId)
+    const { User, Setting } = this.service
+    const userInfo = await User.find({ userId })
+    const setting = new Setting(userId)
     const userSetting = await setting.get()
 
     if (userInfo && userSetting) {
@@ -53,16 +54,18 @@ export default class UserController extends Controller {
     nickname: { type: String, required: false, example: 'string' },
     selfIntroduction: { type: String, required: false, example: 'string' }
   })
-  @middlewares([authorization()])
+  @middlewares([auth()])
   public async saveProfile() {
     const { userId } = this.ctx
     const profile = this.ctx.request.body
-    const result = await this.service.User.find({ userId })
+    const { User } = this.service
+
+    const result = await User.find({ userId })
     if (!result) {
       this.ctx.resp({}, '用户不存在', 200)
       return
     }
-    const user = new this.service.User()
+    const user = new User()
     await user.initById(userId)
     await user.updateProfile(profile)
 
@@ -116,7 +119,7 @@ export default class UserController extends Controller {
 
   @post('/sign_out')
   @summary('user account sign out')
-  @middlewares([authorization()])
+  @middlewares([auth()])
   public async signOut() {
     const { userId } = this.ctx
     if (!userId) {

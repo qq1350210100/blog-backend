@@ -70,3 +70,12 @@ export async function remove(id: string) {
     throwSqlError(err)
   }
 }
+
+export async function increaseViews(articleId: string, newViews: number) {
+  const sql = /*sql*/ `UPDATE article SET views = ${newViews} WHERE id = ${articleId};`
+  try {
+    await db.query(sql)
+  } catch (err) {
+    throwSqlError(err)
+  }
+}

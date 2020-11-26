@@ -26,7 +26,7 @@ export default class Article extends Service {
     this._content = value
   }
 
-  public constructor(info: ArticleInfo) {
+  constructor(info: ArticleInfo) {
     super()
     this._info = info
   }
@@ -51,5 +51,14 @@ export default class Article extends Service {
     if (sort) return await this.dao.article.findBySort(sort)
     // 考虑到 number 0
     if (id != null) return await this.dao.article.findById(id)
+  }
+
+  public async increaseViews(articleId: string) {
+    if (!this.info) return
+
+    const increment: number = 1
+    const oldViews: number = this.info.views
+    const newViews: number = oldViews + increment
+    await this.dao.article.increaseViews(articleId, newViews)
   }
 }

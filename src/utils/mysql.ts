@@ -11,7 +11,7 @@ const config = {
 
 export class Mysql {
   pool: mysql.Pool
-  public constructor(config: string | mysql.PoolConfig) {
+  constructor(config: string | mysql.PoolConfig) {
     this.pool = mysql.createPool(config)
   }
 

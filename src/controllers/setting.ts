@@ -2,14 +2,14 @@ import { body, middlewares, prefix, query, summary, tagsAll } from 'koa-swagger-
 import Controller from '../utils/baseClass/Controller'
 import { get, post } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
-import authorization from '../middlewares/auth'
+import { auth } from '../middlewares'
 
 @prefix('/setting')
 @tagsAll(['Setting'])
 export default class SettingController extends Controller {
   @get('/fetch')
   @summary('fetch user setting')
-  @middlewares([authorization()])
+  @middlewares([auth()])
   public async fetchSetting() {
     const { userId } = this.ctx
     const setting = new this.service.Setting(userId)
@@ -25,7 +25,7 @@ export default class SettingController extends Controller {
     useMarkdownGuide: { type: Boolean, required: false, example: false },
     theme: { type: String, required: false, example: 'string' }
   })
-  @middlewares([authorization()])
+  @middlewares([auth()])
   public async updateSetting() {
     const {
       userId,

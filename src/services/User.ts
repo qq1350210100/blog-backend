@@ -46,7 +46,7 @@ export default class User extends Service {
     this._aritlceList = value
   }
 
-  public constructor() {
+  constructor() {
     super()
     this._aritlceList = []
   }

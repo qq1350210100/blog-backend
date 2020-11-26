@@ -6,7 +6,7 @@ import response from './response.js'
 import { koaCompose } from './utils.js'
 
 export default class Applicant extends EventEmitter {
-  public constructor() {
+  constructor() {
     super()
     this.middlewares = []
     this.context = context
