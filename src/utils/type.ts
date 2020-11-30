@@ -17,9 +17,13 @@ export type Profile = Partial<{
   selfIntroduction: string
   level: number
   isOnline: boolean
+  github: string
+  wechat: string
+  phone: string
+  email: string
 }>
 
-export type StrArray = number[] | string
+export type StrArray = number[] | string[] | string
 
 export interface ArticleInfo {
   articleId: number

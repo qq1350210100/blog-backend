@@ -39,7 +39,14 @@ export default class UserController extends Controller {
     const { username } = this.ctx.query
     const res = await this.service.User.find({ username })
     if (res?.profile) {
-      this.ctx.resp({ ...convertToBoolean(res.profile), username }, RespMsg.OK, 200)
+      this.ctx.resp(
+        {
+          ...convertToBoolean(res.profile),
+          username
+        },
+        RespMsg.OK,
+        200
+      )
     } else {
       this.ctx.resp({}, '用户不存在', 200)
     }
@@ -58,16 +65,20 @@ export default class UserController extends Controller {
   public async saveProfile() {
     const { userId } = this.ctx
     const profile = this.ctx.request.body
+    const {
+      contacts: { github, email, phone, wechat },
+      ...rest
+    } = profile
     const { User } = this.service
-
-    const result = await User.find({ userId })
-    if (!result) {
-      this.ctx.resp({}, '用户不存在', 200)
-      return
-    }
     const user = new User()
     await user.initById(userId)
-    await user.updateProfile(profile)
+    await user.updateProfile({
+      ...rest,
+      github,
+      email,
+      phone,
+      wechat
+    })
 
     this.ctx.resp({}, RespMsg.OK, 200)
   }

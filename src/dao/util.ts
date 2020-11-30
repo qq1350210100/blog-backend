@@ -9,8 +9,8 @@ export function throwNoResult() {
   throw `查询结果为空`
 }
 
-export function stringToArray(string: StrArray): number[] {
-  return string && typeof string === 'string' ? string.split(',').map(Number) : []
+export function stringToArray(string: StrArray): string[] {
+  return string && typeof string === 'string' ? string.split(',') : []
 }
 
 export function where(key: WhereKey, value: string | number): string {

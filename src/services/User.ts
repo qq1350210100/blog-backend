@@ -132,5 +132,6 @@ export default class User extends Service {
   public static async find({ username, userId }: { username?: string; userId?: number }) {
     if (username) return await this.dao.user.findByName(username)
     if (userId) return await this.dao.user.findById(userId)
+    throw '用户不存在'
   }
 }

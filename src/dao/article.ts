@@ -21,7 +21,7 @@ async function _find(whereSql: string) {
     return results.map(article => ({
       ...article,
       tags: stringToArray(article.tags),
-      likes: stringToArray(article.likes)
+      likes: stringToArray(article.likes).map(Number)
     }))
   } catch (err) {
     throwSqlError(err)

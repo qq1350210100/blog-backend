@@ -23,7 +23,11 @@ async function _find(whereSql: string) {
       gender,
       self_introduction AS selfIntroduction,
       level,
-      is_online AS isOnline
+      is_online AS isOnline,
+      github,
+      email,
+      phone,
+      wechat
     FROM user ${whereSql};
   `
   try {
@@ -31,12 +35,16 @@ async function _find(whereSql: string) {
     if (!results.length) return
 
     const { username, password, ...profile } = results[0]
+    const { github, email, phone, wechat } = profile
     return {
       account: {
         username,
         password
       },
-      profile
+      profile: {
+        ...profile,
+        contacts: { github, email, phone, wechat }
+      }
     }
   } catch (err) {
     throwSqlError(err)
@@ -101,6 +109,10 @@ export async function setProfile(userId: number, profile: Profile) {
       avatar = "${profile.avatar}",
       gender = "${profile.gender}",
       self_introduction = "${profile.selfIntroduction}",
+      github = "${profile.github}",
+      email = "${profile.email}",
+      phone = "${profile.phone}",
+      wechat = "${profile.wechat}",
       level = "${profile.level}"
       WHERE id = ${userId};
   `
