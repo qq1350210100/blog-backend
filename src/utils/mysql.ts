@@ -15,7 +15,7 @@ export class Mysql {
     this.pool = mysql.createPool(config)
   }
 
-  public query = (sql: string) => {
+  public query = (sql: string): Promise<unknown> => {
     return new Promise((resolve, reject) => {
       this.pool.query(sql, (error, results: any) => {
         if (error) reject(error)

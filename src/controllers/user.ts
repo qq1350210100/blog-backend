@@ -4,6 +4,8 @@ import { get, post } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
 import { convertToBoolean } from '../utils'
 import { auth } from '../middlewares'
+import { Context } from 'koa'
+import { Profile } from '../utils/type'
 
 @prefix('/user')
 @tagsAll(['User'])
@@ -12,7 +14,7 @@ export default class UserController extends Controller {
   @summary('init user data, include accout,profile and setting')
   @middlewares([auth()])
   public async getSignStatus() {
-    const { userId } = this.ctx
+    const { userId } = this.ctx as Context & { userId: number }
     const { User, Setting } = this.service
     const userInfo = await User.find({ userId })
     const setting = new Setting(userId)
@@ -35,7 +37,7 @@ export default class UserController extends Controller {
     username: { type: String, required: true, example: 'string' }
   })
   public async getProfile() {
-    const { username } = this.ctx.query
+    const { username }: { username: string } = this.ctx.query
     const res = await this.service.User.find({ username })
     if (res?.profile) {
       this.ctx.resp(
@@ -61,13 +63,14 @@ export default class UserController extends Controller {
     selfIntroduction: { type: String, required: false, example: 'string' }
   })
   @middlewares([auth()])
-  public async saveProfile() {
-    const { userId } = this.ctx
-    const profile = this.ctx.request.body
+  public async saveProfile(): Promise<void> {
+    let { userId } = this.ctx as Context & { userId: number }
+    userId = Number(userId)
     const {
       contacts: { github, email, phone, wechat },
       ...rest
-    } = profile
+    } = this.ctx.request.body
+
     const { User } = this.service
     const user = new User()
     await user.initById(userId)
@@ -88,8 +91,8 @@ export default class UserController extends Controller {
     username: { type: String, required: true, example: 'string' },
     password: { type: String, required: true, example: 'string' }
   })
-  public async signIn() {
-    const { username, password } = this.ctx.request.body
+  public async signIn(): Promise<void> {
+    const { username, password }: { username: string; password: string } = this.ctx.request.body
     const user = new this.service.User()
     user.profile = {
       nickname: '匿名用户'
@@ -112,26 +115,32 @@ export default class UserController extends Controller {
     password: { type: String, required: true, example: 'string' },
     profile: { type: Object, required: false, example: { nickname: 'string' } }
   })
-  public async register() {
-    const { username, password, profile = {} } = this.ctx.request.body
+  public async register(): Promise<void> {
+    const {
+      username,
+      password,
+      profile = {}
+    }: {
+      username: string
+      password: string
+      profile: Profile
+    } = this.ctx.request.body
+
     const user = new this.service.User()
-    try {
-      await user.register(username, password, {
-        ...profile,
-        level: 1,
-        isOnline: 0
-      })
-      this.ctx.resp({}, RespMsg.OK, 200)
-    } catch (err) {
-      this.ctx.resp({}, err, 200)
-    }
+    await user.register(username, password, {
+      ...profile,
+      level: 1,
+      isOnline: false
+    })
+    this.ctx.resp({}, RespMsg.OK, 200)
   }
 
   @post('/sign_out')
   @summary('user account sign out')
   @middlewares([auth()])
-  public async signOut() {
-    const { userId } = this.ctx
+  public async signOut(): Promise<void> {
+    let { userId } = this.ctx as Context & { userId: number }
+    userId = Number(userId)
     await this.service.User.signOut(userId)
     this.ctx.session = null
     this.ctx.resp({}, RespMsg.OK, 200)

@@ -1,7 +1,7 @@
 import Koa from 'koa'
 import { User } from '../services'
 
-export default function authorization() {
+export default function authorization(): (ctx: Koa.Context, next: Koa.Next) => Promise<void> {
   return async (ctx: Koa.Context, next: Koa.Next) => {
     const respBody = {
       message: '没有权限',

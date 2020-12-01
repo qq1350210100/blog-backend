@@ -51,7 +51,7 @@ export default class User extends Service {
     this._aritlceList = []
   }
 
-  public async addArticle(article: Article) {
+  public async addArticle(article: Article): Promise<void> {
     if (!article.info || !this.username) return
 
     article.info.author = this.username
@@ -59,23 +59,23 @@ export default class User extends Service {
     this.aritlceList.push(article)
   }
 
-  public async removeArticle(articleId: number) {
+  public async removeArticle(articleId: number): Promise<void> {
     await Article.remove(articleId)
     this.aritlceList = this.aritlceList
       .map(article => (article.info?.articleId === articleId ? false : article))
       .filter(Boolean) as Article[]
   }
 
-  private setUserInfo(userId: number, username: string, password: string, profile: Profile) {
+  private setUserInfo(userId: number, username: string, password: string, profile: Profile): void {
     this.userId = userId
     this.username = username
     this.password = password
     this.profile = profile
   }
 
-  public async initById(userId: number) {
+  public async initById(userId: number): Promise<void> {
     const result = await User.find({ userId })
-    if (!result) throw '用户不存在'
+    if (!result) throw { message: '用户不存在', code: 200 }
 
     const {
       account: { username, password },
@@ -84,10 +84,10 @@ export default class User extends Service {
     this.setUserInfo(userId, username, password, profile)
   }
 
-  public async register(username: string, password: string, profile: Profile) {
-    console.log('username: ', username)
-    if (await User.find({ username })) throw '用户已存在'
-    if (!is.object(profile)) throw '资料不全，注册失败'
+  public async register(username: string, password: string, profile: Profile): Promise<void> {
+    const userHadExist = Boolean(await User.find({ username }))
+    if (userHadExist) throw { message: '用户已存在', code: 200 }
+    if (!is.object(profile)) throw { message: '资料不全，注册失败', code: 200 }
 
     await this.dao.user.create(username, password, profile)
 
@@ -99,13 +99,15 @@ export default class User extends Service {
       await setting.add()
       this.setUserInfo(userId, username, password, profile)
     } else {
-      throw '注册失败'
+      throw { message: '注册失败', code: 200 }
     }
   }
 
-  public async signIn(username: string, password: string) {
+  public async signIn(username: string, password: string): Promise<void> {
     const result = await User.find({ username })
-    if (!result) throw '用户不存在'
+    if (!result) {
+      throw { message: '用户不存在', code: 200 }
+    }
 
     await this.dao.user.signIn(username, password)
     const userId = result.profile.userId
@@ -114,32 +116,48 @@ export default class User extends Service {
     }
   }
 
-  public async updateProfile(profile: Profile) {
+  public async updateProfile(profile: Profile): Promise<void> {
     const newProfile = { ...this.profile, ...profile }
 
     if (!this.userId) {
-      throw 'userId 不存在'
+      throw { message: '用户不存在', code: 200 }
     }
     this.dao.user.setProfile(this.userId, newProfile)
   }
 
-  public static async signOut(userId: number) {
-    if (!(await User.find({ userId }))) throw '用户不存在'
+  public static async signOut(userId: number): Promise<void> {
+    if (!(await User.find({ userId }))) {
+      throw { message: '用户不存在', code: 200 }
+    }
 
     await this.dao.user.signOut(userId)
   }
 
   public static async find({ username, userId }: { username?: string; userId?: number }) {
-    if (username) return await this.dao.user.findByName(username)
-    if (userId) return await this.dao.user.findById(userId)
-    throw '用户不存在'
+    if (username) {
+      return await this.dao.user.findByName(username)
+    }
+    if (userId) {
+      return await this.dao.user.findById(userId)
+    }
+    throw { message: '用户不存在', code: 200 }
   }
 
   /**
    * 文章模糊匹配
    * @param keywords 关键字 - username、nickname
    */
-  public static async search(keywords: string, limit?: number) {
+  public static async search(
+    keywords: string,
+    limit?: number
+  ): Promise<
+    {
+      id: number
+      username: string
+      nickname: string
+      avatar: string
+    }[]
+  > {
     return (await this.dao.user.search(keywords, limit)) || []
   }
 }

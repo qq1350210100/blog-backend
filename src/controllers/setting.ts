@@ -10,7 +10,7 @@ export default class SettingController extends Controller {
   @get('/fetch')
   @summary('fetch user setting')
   @middlewares([auth()])
-  public async fetchSetting() {
+  public async fetchSetting(): Promise<void> {
     const { userId } = this.ctx
     const setting = new this.service.Setting(userId)
     const result = await setting.get()
@@ -26,7 +26,7 @@ export default class SettingController extends Controller {
     theme: { type: String, required: false, example: 'string' }
   })
   @middlewares([auth()])
-  public async updateSetting() {
+  public async updateSetting(): Promise<void> {
     const {
       userId,
       request: {

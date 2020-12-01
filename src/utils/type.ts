@@ -23,12 +23,21 @@ export type Profile = Partial<{
   email: string
 }>
 
+export type FormatedProfile = Omit<Profile, 'github' | 'wechat' | 'phone' | 'email'> & {
+  contacts: Partial<{
+    github: string
+    wechat: string
+    phone: string
+    email: string
+  }>
+}
+
 export type StrArray = number[] | string[] | string
 
 export interface ArticleInfo {
   articleId: number
   introduce: string
-  sort: string
+  category: string
   title: string
   author: string
   views: number
@@ -36,6 +45,11 @@ export interface ArticleInfo {
   likes: StrArray
   backgroundImage: string
   creationTime: number
+}
+
+export type FormatedArticleInfo = Omit<ArticleInfo, 'tags' | 'likes'> & {
+  tags: string[]
+  likes: number[]
 }
 
 export type ArticleDetail = ArticleInfo & { content: string }
@@ -50,3 +64,5 @@ export type UserSetting = {
   useMarkdownGuide: boolean
   theme: string
 }
+
+export type ArticleSordBy = 'latest' | 'popular' | 'random'

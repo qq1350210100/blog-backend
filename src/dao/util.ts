@@ -1,12 +1,12 @@
 import { StrArray } from '../utils/type'
 import { WhereKey } from '../utils/enums'
 
-export function throwSqlError(err: Error) {
-  throw `SQL执行失败, ${err}`
+export function throwSqlError(err: Error): void {
+  throw { message: `SQL执行失败, ${err}`, code: 500 }
 }
 
-export function throwNoResult() {
-  throw `查询结果为空`
+export function throwNoResult(): void {
+  throw { message: '查询结果为空', code: 200 }
 }
 
 export function stringToArray(string: StrArray): string[] {

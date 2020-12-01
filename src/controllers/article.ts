@@ -2,7 +2,7 @@ import Controller from '../utils/baseClass/Controller'
 import { prefix, summary, query, body, tagsAll, middlewares, params } from 'koa-swagger-decorator'
 import { get, post } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
-import { ArticleDetail, ArticleInfo } from '../utils/type'
+import { ArticleDetail, ArticleInfo, ArticleSordBy } from '../utils/type'
 import omit from 'omit.js'
 import { auth } from '../middlewares'
 
@@ -10,13 +10,25 @@ import { auth } from '../middlewares'
 @tagsAll(['Article'])
 export default class ArticleController extends Controller {
   @get('/list')
-  @summary('fetch article list by sort')
+  @summary('fetch article list')
   @query({
-    sort: { type: String, required: false, example: 'string' }
+    category: { type: String, required: false, example: 'string' },
+    limit: { type: Number, required: false, example: 10 },
+    sortBy: { type: String, required: true, example: 'string' }
   })
-  public async list() {
-    const { sort = 'all' }: { sort: string } = this.ctx.query
-    const aritcles = await this.service.Article.find({ sort })
+  public async list(): Promise<void> {
+    let {
+      category = 'all',
+      sortBy,
+      limit
+    }: {
+      category: string
+      sortBy: ArticleSordBy
+      limit: number
+    } = this.ctx.query
+    limit = Number(limit)
+
+    const aritcles = await this.service.Article.find({ category, sortBy })
     this.ctx.resp(aritcles, RespMsg.OK, 200)
   }
 
@@ -25,9 +37,9 @@ export default class ArticleController extends Controller {
   @query({
     articleId: { type: Number, required: true, example: 1 }
   })
-  public async detail() {
-    const body: { articleId: number } = this.ctx.query
-    const articleId = Number(body.articleId)
+  public async detail(): Promise<void> {
+    let { articleId }: { articleId: number } = this.ctx.query
+    articleId = Number(articleId)
     const { Article } = this.service
     const results = await Article.find({ id: articleId })
     const content = await Article.getContent(articleId)
@@ -48,13 +60,16 @@ export default class ArticleController extends Controller {
     userId: { type: Number, required: true, example: 1 },
     articleDetail: { type: Object, required: true, example: {} }
   })
-  public async add() {
-    const body: {
+  public async add(): Promise<void> {
+    let {
+      userId,
+      articleDetail
+    }: {
       userId: number
       articleDetail: ArticleDetail
     } = this.ctx.request.body
-    const { articleDetail } = body
-    const userId = Number(body.userId)
+    userId = Number(userId)
+
     const { Article, User } = this.service
 
     const articleInfo: ArticleInfo = omit({ ...articleDetail }, ['content'])
@@ -73,9 +88,9 @@ export default class ArticleController extends Controller {
   @body({
     articleId: { type: Number, required: true, example: 1 }
   })
-  public async remove() {
-    const body: { articleId: number } = this.ctx.request.body
-    const articleId = Number(body.articleId)
+  public async remove(): Promise<void> {
+    let { articleId }: { articleId: number } = this.ctx.request.body
+    articleId = Number(articleId)
     await this.service.Article.remove(articleId)
     this.ctx.resp({}, RespMsg.OK, 200)
   }
@@ -85,9 +100,9 @@ export default class ArticleController extends Controller {
   @body({
     articleId: { type: Number, required: true, example: 1 }
   })
-  public async increaseViews() {
-    const body: { articleId: number } = this.ctx.request.body
-    const articleId = Number(body.articleId)
+  public async increaseViews(): Promise<void> {
+    let { articleId }: { articleId: number } = this.ctx.request.body
+    articleId = Number(articleId)
     const { Article } = this.service
 
     if (!articleId) return
@@ -109,10 +124,10 @@ export default class ArticleController extends Controller {
     userId: { type: Number, required: true, example: 1 },
     articleId: { type: Number, required: true, example: 1 }
   })
-  public async likes() {
-    const body: { articleId: number; userId: number } = this.ctx.request.body
-    const articleId = Number(body.articleId)
-    const userId = Number(body.userId)
+  public async likes(): Promise<void> {
+    let { articleId, userId }: { articleId: number; userId: number } = this.ctx.request.body
+    articleId = Number(articleId)
+    userId = Number(userId)
 
     const { User, Article } = this.service
     const user = new User()
@@ -130,10 +145,10 @@ export default class ArticleController extends Controller {
     userId: { type: Number, required: true, example: 1 },
     articleId: { type: Number, required: true, example: 1 }
   })
-  public async dislike() {
-    const body: { articleId: number; userId: number } = this.ctx.request.body
-    const articleId = Number(body.articleId)
-    const userId = Number(body.userId)
+  public async dislike(): Promise<void> {
+    let { articleId, userId }: { articleId: number; userId: number } = this.ctx.request.body
+    articleId = Number(articleId)
+    userId = Number(userId)
 
     const { User, Article } = this.service
     const user = new User()

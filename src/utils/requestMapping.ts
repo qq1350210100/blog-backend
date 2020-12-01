@@ -1,10 +1,16 @@
 import { request } from 'koa-swagger-decorator'
 import { Method } from '../utils/enums'
 
-export const get = (url: string) => request(Method.GET, url)
+type RequestDecorator = (
+  target: any,
+  name: string,
+  descriptor: PropertyDescriptor
+) => PropertyDescriptor
 
-export const post = (url: string) => request(Method.POST, url)
+export const get = (url: string): RequestDecorator => request(Method.GET, url)
 
-export const put = (url: string) => request(Method.PUT, url)
+export const post = (url: string): RequestDecorator => request(Method.POST, url)
 
-export const delelte = (url: string) => request(Method.DELELTE, url)
+export const put = (url: string): RequestDecorator => request(Method.PUT, url)
+
+export const delelte = (url: string): RequestDecorator => request(Method.DELELTE, url)

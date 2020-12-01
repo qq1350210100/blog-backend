@@ -48,7 +48,7 @@ export default class Setting extends Service {
     this._useMarkdownGuide = true
   }
 
-  private _setSetting(setting: UserSetting) {
+  private _setSetting(setting: UserSetting): void {
     if (!setting) return
 
     this.theme = setting.theme || this.theme
@@ -57,7 +57,7 @@ export default class Setting extends Service {
     this.useMarkdownGuide = setting.useMarkdownGuide || this.useMarkdownGuide
   }
 
-  public async get() {
+  public async get(): Promise<UserSetting | undefined> {
     await User.find({ userId: this.userId })
     const userSetting = await this.dao.setting.find(this.userId)
     if (userSetting) {
@@ -67,12 +67,12 @@ export default class Setting extends Service {
     }
   }
 
-  public async add() {
+  public async add(): Promise<void> {
     await User.find({ userId: this.userId })
     await this.dao.setting.add(this.userId)
   }
 
-  public async update(setting: UserSetting) {
+  public async update(setting: UserSetting): Promise<void> {
     this._setSetting(setting)
     await this.dao.setting.update(this.userId, setting)
   }

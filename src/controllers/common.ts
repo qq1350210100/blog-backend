@@ -12,10 +12,11 @@ export default class CommonController extends Controller {
     keywords: { type: String, required: true, example: 'string' },
     limit: { type: Number, required: false, example: 10 }
   })
-  public async search() {
-    const query = this.ctx.query
-    const keywords = query.keywords.toString()
-    const limit = Number(query.limit)
+  public async search(): Promise<void> {
+    let { keywords, limit } = this.ctx.query
+    keywords = keywords.toString()
+    limit = Number(limit)
+
     const { Article, User } = this.service
     const [articles, users] = await Promise.all([
       Article.search(keywords, limit),
