@@ -27,7 +27,6 @@ export default class UserController extends Controller {
       this.ctx.resp(result, RespMsg.OK, 200)
       return
     }
-    this.ctx.resp({}, '用户未登录', 200)
   }
 
   @get('/profile')
@@ -93,7 +92,7 @@ export default class UserController extends Controller {
     const { username, password } = this.ctx.request.body
     const user = new this.service.User()
     user.profile = {
-      nickname: '匿名'
+      nickname: '匿名用户'
     }
     try {
       await user.signIn(username, password)
@@ -133,10 +132,6 @@ export default class UserController extends Controller {
   @middlewares([auth()])
   public async signOut() {
     const { userId } = this.ctx
-    if (!userId) {
-      this.ctx.resp({}, '用户未登录', 200)
-      return
-    }
     await this.service.User.signOut(userId)
     this.ctx.session = null
     this.ctx.resp({}, RespMsg.OK, 200)

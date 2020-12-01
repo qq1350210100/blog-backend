@@ -134,4 +134,12 @@ export default class User extends Service {
     if (userId) return await this.dao.user.findById(userId)
     throw '用户不存在'
   }
+
+  /**
+   * 文章模糊匹配
+   * @param keywords 关键字 - username、nickname
+   */
+  public static async search(keywords: string, limit?: number) {
+    return (await this.dao.user.search(keywords, limit)) || []
+  }
 }

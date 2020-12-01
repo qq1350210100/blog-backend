@@ -5,7 +5,7 @@ import { WhereKey } from '../utils/enums'
 
 async function _updateOnline(online: boolean, whereSql: string) {
   try {
-    const sql = /*sql*/ `UPDATE user SET is_online = ${online ? 1 : 0} ${whereSql};`
+    const sql = /*sql*/ `UPDATE blog.user SET is_online = ${online ? 1 : 0} ${whereSql};`
     await db.query(sql)
   } catch (err) {
     throwSqlError(err)
@@ -28,7 +28,7 @@ async function _find(whereSql: string) {
       email,
       phone,
       wechat
-    FROM user ${whereSql};
+    FROM blog.user ${whereSql};
   `
   try {
     const results = (await db.query(sql)) as Account[] & Profile[]
@@ -52,7 +52,7 @@ async function _find(whereSql: string) {
 }
 
 async function _validate(password: string, whereSql: string) {
-  const sql = /*sql*/ `SELECT password FROM user ${whereSql};`
+  const sql = /*sql*/ `SELECT password FROM blog.user ${whereSql};`
   try {
     const results = (await db.query(sql)) as { password: string }[]
     if (!results.length) return false
@@ -65,7 +65,7 @@ async function _validate(password: string, whereSql: string) {
 
 export async function create(username: string, password: string, profile: Profile) {
   const sql = /*sql*/ `
-    INSERT INTO user SET
+    INSERT INTO blog.user SET
       username = "${username}",
       password = "${password}",
       nickname = "${profile.nickname}",
@@ -104,7 +104,7 @@ export function findByName(username: string) {
 
 export async function setProfile(userId: number, profile: Profile) {
   const sql = /*sql*/ `
-    UPDATE user SET
+    UPDATE blog.user SET
       nickname = "${profile.nickname}",
       avatar = "${profile.avatar}",
       gender = "${profile.gender}",
@@ -119,4 +119,24 @@ export async function setProfile(userId: number, profile: Profile) {
   try {
     await db.query(sql)
   } catch (err) {}
+}
+
+export async function search(keywords: string, limit?: number) {
+  let limitSql: string = limit ? `LIMIT ${limit}` : ''
+  const sql = /*sql*/ `
+    SELECT id, username, nickname, avatar FROM blog.user 
+    WHERE username LIKE '%${keywords}%' 
+    OR nickname LIKE '%${keywords}%'
+    ${limitSql};
+  `
+  try {
+    return (await db.query(sql)) as {
+      id: number
+      username: string
+      nickname: string
+      avatar: string
+    }[]
+  } catch (err) {
+    throwSqlError(err)
+  }
 }

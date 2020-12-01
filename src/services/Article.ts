@@ -83,6 +83,14 @@ export default class Article extends Service {
     if (id != null) return await this.dao.article.findById(id)
   }
 
+  /**
+   * 文章模糊匹配
+   * @param keywords 关键字 - title、introduce和content
+   */
+  public static async search(keywords: string, limit?: number) {
+    return (await this.dao.article.search(keywords, limit)) || []
+  }
+
   public async increaseViews() {
     if (!this.info) return
 

@@ -1,5 +1,5 @@
 import Controller from '../utils/baseClass/Controller'
-import { prefix, summary, query, body, tagsAll, middlewares } from 'koa-swagger-decorator'
+import { prefix, summary, query, body, tagsAll, middlewares, params } from 'koa-swagger-decorator'
 import { get, post } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
 import { ArticleDetail, ArticleInfo } from '../utils/type'

@@ -3,7 +3,7 @@ import { throwSqlError } from './util'
 import { UserSetting } from '../utils/type'
 
 export async function add(userId: number) {
-  const sql = /*sql*/ `INSERT INTO setting SET user_id = ${userId};`
+  const sql = /*sql*/ `INSERT INTO blog.setting SET user_id = ${userId};`
   try {
     await db.query(sql)
   } catch (err) {
@@ -13,7 +13,7 @@ export async function add(userId: number) {
 
 export async function update(userId: number, setting: UserSetting) {
   const sql = /*sql*/ `
-    UPDATE setting SET
+    UPDATE blog.setting SET
       drawer_default_opened = ${setting.drawerDefaultOpened},
       use_markdown_guide = ${setting.useMarkdownGuide},
       lang = "${setting.lang}",
@@ -34,7 +34,7 @@ export async function find(userId: number) {
     use_markdown_guide as useMarkdownGuide,
     lang as lang,
     theme as theme
-    FROM setting WHERE user_id = ${userId};
+    FROM blog.setting WHERE user_id = ${userId};
   `
   try {
     const results = (await db.query(sql)) as UserSetting[]
