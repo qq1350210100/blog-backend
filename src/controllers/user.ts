@@ -104,7 +104,7 @@ export default class UserController extends Controller {
         this.ctx.resp({}, RespMsg.OK, 200)
       }
     } catch (err) {
-      this.ctx.resp({}, err, 200)
+      this.ctx.resp({}, err.message, err.code)
     }
   }
 

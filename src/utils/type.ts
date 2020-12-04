@@ -45,6 +45,8 @@ export interface ArticleInfo {
   likes: StrArray
   backgroundImage: string
   creationTime: number
+  comments: string[]
+  collections: string[]
 }
 
 export type FormatedArticleInfo = Omit<ArticleInfo, 'tags' | 'likes'> & {

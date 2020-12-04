@@ -12,8 +12,11 @@ async function _find(whereSql: string): Promise<FormatedArticleInfo[] | undefine
       background_image AS backgroundImage,
       views,
       creation_time AS creationTime,
+      introduce,
       tags,
-      likes
+      likes,
+      collections,
+      comments
     FROM blog.article ${whereSql};
   `
   try {

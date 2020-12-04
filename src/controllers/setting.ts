@@ -43,7 +43,7 @@ export default class SettingController extends Controller {
       })
       this.ctx.resp({}, RespMsg.OK, 200)
     } catch (err) {
-      this.ctx.resp({}, err, 500)
+      this.ctx.resp({}, err.message, 500)
     }
   }
 }
