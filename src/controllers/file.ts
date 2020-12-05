@@ -35,7 +35,11 @@ export default class FileController extends Controller {
         file.filename
       )}`
       const savedPath: string = path.join(process.cwd(), 'static/images', filename)
-      await promisify(stream.pipeline)(file, fs.createWriteStream(savedPath))
+      try {
+        await promisify(stream.pipeline)(file, fs.createWriteStream(savedPath))
+      } catch (error) {
+        this.ctx.resp({}, error, 500)
+      }
       const imgUrl: string = request.origin + '/' + path.join('images', filename)
       return imgUrl
     }
