@@ -80,6 +80,10 @@ export async function create(username: string, password: string, profile: Profil
       avatar = "${profile.avatar}",
       gender = "${profile.gender}",
       self_introduction = "${profile.selfIntroduction}",
+      github = "${profile.github}",
+      phone = "${profile.phone}",
+      email = "${profile.email}",
+      wechat = "${profile.wechat}",
       level = "${profile.level}",
       is_online = "${profile.isOnline ? 1 : 0}";
   `

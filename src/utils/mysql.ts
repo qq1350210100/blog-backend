@@ -1,25 +1,25 @@
-import mysql from 'mysql'
+import mysql from 'mysql2'
 
 const config = {
-  host: 'localhost',
+  host: '8.129.105.196',
   user: 'root',
-  password: '123456',
+  password: '11568171',
   database: 'blog',
   port: 3306,
-  multipleStatements: true //允许多条sql同时执行
+  multipleStatements: true, //允许多条sql同时执行
+  insecureAuth: true
 }
 
 export class Mysql {
   pool: mysql.Pool
-  constructor(config: string | mysql.PoolConfig) {
+  constructor(config: mysql.PoolOptions) {
     this.pool = mysql.createPool(config)
   }
 
   public query = (sql: string): Promise<unknown> => {
     return new Promise((resolve, reject) => {
       this.pool.query(sql, (error, results: any) => {
-        if (error) reject(error)
-        resolve(results)
+        error ? reject(error) : resolve(results)
       })
     })
   }
