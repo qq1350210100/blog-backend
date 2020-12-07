@@ -18,7 +18,7 @@ export class Mysql {
 
   public query = (sql: string): Promise<unknown> => {
     return new Promise((resolve, reject) => {
-      this.pool.query(sql, (error, results: any) => {
+      this.pool.query(sql, (error, results: unknown[]) => {
         error ? reject(error) : resolve(results)
       })
     })
