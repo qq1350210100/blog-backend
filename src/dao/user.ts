@@ -2,6 +2,7 @@ import { db } from '../utils/mysql'
 import { throwSqlError, where } from './util'
 import { Account, FormatedProfile, Profile } from '../utils/type'
 import { WhereKey } from '../utils/enums'
+const { escape } = db
 
 type FindUserResult = Promise<
   | {
@@ -13,7 +14,7 @@ type FindUserResult = Promise<
 
 async function _updateOnline(online: boolean, whereSql: string): Promise<void> {
   try {
-    const sql = /*sql*/ `UPDATE blog.user SET is_online = ${online ? 1 : 0} ${whereSql};`
+    const sql = /*sql*/ `UPDATE blog.user SET is_online = ${escape(online)} ${whereSql};`
     await db.query(sql)
   } catch (err) {
     throwSqlError(err)
@@ -74,18 +75,18 @@ async function _validate(password: string, whereSql: string): Promise<boolean> {
 export async function create(username: string, password: string, profile: Profile): Promise<void> {
   const sql = /*sql*/ `
     INSERT INTO blog.user SET
-      username = "${username}",
-      password = "${password}",
-      nickname = "${profile.nickname}",
-      avatar = "${profile.avatar}",
-      gender = "${profile.gender}",
-      self_introduction = "${profile.selfIntroduction}",
-      github = "${profile.github}",
-      phone = "${profile.phone}",
-      email = "${profile.email}",
-      wechat = "${profile.wechat}",
-      level = "${profile.level}",
-      is_online = "${profile.isOnline ? 1 : 0}";
+      username = "${escape(username)}",
+      password = "${escape(password)}",
+      nickname = "${escape(profile.nickname)}",
+      avatar = "${escape(profile.avatar)}",
+      gender = "${escape(profile.gender)}",
+      self_introduction = "${escape(profile.selfIntroduction)}",
+      github = "${escape(profile.github)}",
+      phone = "${escape(profile.phone)}",
+      email = "${escape(profile.email)}",
+      wechat = "${escape(profile.wechat)}",
+      level = "${escape(profile.level)}",
+      is_online = "${escape(profile.isOnline ? 1 : 0)}";
   `
   try {
     await db.query(sql)
@@ -119,16 +120,16 @@ export function findByName(username: string): FindUserResult {
 export async function setProfile(userId: number, profile: Profile): Promise<void> {
   const sql = /*sql*/ `
     UPDATE blog.user SET
-      nickname = "${profile.nickname}",
-      avatar = "${profile.avatar}",
-      gender = "${profile.gender}",
-      self_introduction = "${profile.selfIntroduction}",
-      github = "${profile.github}",
-      email = "${profile.email}",
-      phone = "${profile.phone}",
-      wechat = "${profile.wechat}",
-      level = "${profile.level}"
-      WHERE id = ${userId};
+      nickname = "${escape(profile.nickname)}",
+      avatar = "${escape(profile.avatar)}",
+      gender = "${escape(profile.gender)}",
+      self_introduction = "${escape(profile.selfIntroduction)}",
+      github = "${escape(profile.github)}",
+      email = "${escape(profile.email)}",
+      phone = "${escape(profile.phone)}",
+      wechat = "${escape(profile.wechat)}",
+      level = "${escape(profile.level)}"
+      WHERE id = ${escape(userId)};
   `
   try {
     await db.query(sql)
@@ -147,7 +148,8 @@ export async function search(
     }[]
   | undefined
 > {
-  let limitSql: string = limit ? `LIMIT ${limit}` : ''
+  keywords = escape(keywords)
+  let limitSql: string = limit ? `LIMIT ${escape(limit)}` : ''
   const sql = /*sql*/ `
     SELECT id, username, nickname, avatar FROM blog.user 
     WHERE username LIKE '%${keywords}%' 

@@ -3,6 +3,7 @@ import Article from './Article'
 import { Profile } from '../utils/type'
 import * as is from '../utils/is'
 import { Setting } from '.'
+import { article } from '../dao'
 
 export default class User extends Service {
   private _userId?: number
@@ -61,9 +62,9 @@ export default class User extends Service {
 
   public async removeArticle(articleId: number): Promise<void> {
     await Article.remove(articleId)
-    this.aritlceList = this.aritlceList
-      .map(article => (article.info?.articleId === articleId ? false : article))
-      .filter(Boolean) as Article[]
+    this.aritlceList = this.aritlceList.filter(
+      (article: Article) => article.info?.articleId !== articleId
+    )
   }
 
   private setUserInfo(userId: number, username: string, password: string, profile: Profile): void {

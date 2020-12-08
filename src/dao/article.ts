@@ -2,6 +2,8 @@ import { db } from '../utils/mysql'
 import { throwSqlError, stringToArray } from './util'
 import { ArticleInfo, ArticleDetail, FormatedArticleInfo } from '../utils/type'
 
+const { escape } = db
+
 async function _find(whereSql: string): Promise<FormatedArticleInfo[] | undefined> {
   const sql = /*sql*/ `
     SELECT
@@ -35,17 +37,17 @@ export function findAndSort(
   category: string,
   orderKey?: 'creation_time' | 'views'
 ): Promise<FormatedArticleInfo[] | undefined> {
-  let whereSql: string = category === 'all' ? '' : `WHERE category = "${category}"`
-  let orderSql: string = orderKey ? `ORDER BY ${orderKey} DESC` : ''
+  let whereSql: string = category === 'all' ? '' : `WHERE category = "${escape(category)}"`
+  let orderSql: string = orderKey ? `ORDER BY ${escape(orderKey)} DESC` : ''
   return _find(`${whereSql} ${orderSql}`)
 }
 
 export function findById(id: number): Promise<FormatedArticleInfo[] | undefined> {
-  return _find(`WHERE id = ${id}`)
+  return _find(`WHERE id = ${escape(id)}`)
 }
 
 export async function getContent(articleId: number): Promise<string | undefined> {
-  const sql = /*sql*/ `SELECT content FROM blog.article WHERE id = ${articleId};`
+  const sql = /*sql*/ `SELECT content FROM blog.article WHERE id = ${escape(articleId)};`
   try {
     const results = (await db.query(sql)) as { content: string }[]
     if (!results.length) return
@@ -59,14 +61,14 @@ export async function add(detail: ArticleDetail): Promise<void> {
   const tagsStr = Array.isArray(detail.tags) ? detail.tags.join(',') : ''
   const sql = /*sql*/ `
     INSERT INTO blog.article SET 
-      background_image = "${detail.backgroundImage}",
-      title = "${detail.title}",
-      introduce = "${detail.introduce}",
-      content = "${detail.content}",
-      author = "${detail.author}",
-      category = "${detail.category}",
-      tags = "${tagsStr}",
-      creation_time = "${detail.creationTime}";
+      background_image = "${escape(detail.backgroundImage)}",
+      title = "${escape(detail.title)}",
+      introduce = "${escape(detail.introduce)}",
+      content = "${escape(detail.content)}",
+      author = "${escape(detail.author)}",
+      category = "${escape(detail.category)}",
+      tags = "${escape(tagsStr)}",
+      creation_time = ${escape(detail.creationTime)};
   `
   try {
     await db.query(sql)
@@ -76,7 +78,7 @@ export async function add(detail: ArticleDetail): Promise<void> {
 }
 
 export async function remove(id: number): Promise<void> {
-  const sql = /*sql*/ `DELETE FROM blog.article WHERE id = ${id};`
+  const sql = /*sql*/ `DELETE FROM blog.article WHERE id = ${escape(id)};`
   try {
     await db.query(sql)
   } catch (err) {
@@ -85,7 +87,9 @@ export async function remove(id: number): Promise<void> {
 }
 
 export async function increaseViews(articleId: number, newViews: number): Promise<void> {
-  const sql = /*sql*/ `UPDATE blog.article SET views = ${newViews} WHERE id = ${articleId};`
+  const sql = /*sql*/ `
+    UPDATE blog.article SET views = ${escape(newViews)} WHERE id = ${escape(articleId)};
+  `
   try {
     await db.query(sql)
   } catch (err) {
@@ -95,7 +99,9 @@ export async function increaseViews(articleId: number, newViews: number): Promis
 
 export async function setLikes(articleId: number, likes: number[]): Promise<void> {
   const likesStr: string = likes.join(',')
-  const sql = /*sql*/ `UPDATE blog.article SET likes = "${likesStr}" WHERE id = ${articleId};`
+  const sql = /*sql*/ `UPDATE blog.article SET likes = "${escape(likesStr)}" WHERE id = ${escape(
+    articleId
+  )};`
   try {
     await db.query(sql)
   } catch (err) {
@@ -115,6 +121,7 @@ export async function search(
     }[]
   | undefined
 > {
+  keywords = escape(keywords)
   let limitSql: string = limit ? `LIMIT ${limit}` : ''
   const sql = /*sql*/ `
     SELECT id, title, author, category FROM blog.article 

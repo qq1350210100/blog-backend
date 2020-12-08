@@ -12,8 +12,10 @@ const config = {
 
 export class Mysql {
   pool: mysql.Pool
+  escape: (value: any) => string
   constructor(config: mysql.PoolOptions) {
     this.pool = mysql.createPool(config)
+    this.escape = mysql.escape
   }
 
   public query = (sql: string): Promise<unknown> => {

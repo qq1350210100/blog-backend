@@ -1,9 +1,10 @@
 import { db } from '../utils/mysql'
 import { throwSqlError } from './util'
 import { UserSetting } from '../utils/type'
+const { escape } = db
 
 export async function add(userId: number): Promise<void> {
-  const sql = /*sql*/ `INSERT INTO blog.setting SET user_id = ${userId};`
+  const sql = /*sql*/ `INSERT INTO blog.setting SET user_id = ${escape(userId)};`
   try {
     await db.query(sql)
   } catch (err) {
@@ -14,11 +15,11 @@ export async function add(userId: number): Promise<void> {
 export async function update(userId: number, setting: UserSetting): Promise<void> {
   const sql = /*sql*/ `
     UPDATE blog.setting SET
-      drawer_default_opened = ${setting.drawerDefaultOpened},
-      use_markdown_guide = ${setting.useMarkdownGuide},
-      lang = "${setting.lang}",
-      theme = "${setting.theme}"
-      WHERE user_id = ${userId};
+      drawer_default_opened = ${escape(setting.drawerDefaultOpened)},
+      use_markdown_guide = ${escape(setting.useMarkdownGuide)},
+      lang = "${escape(setting.lang)}",
+      theme = "${escape(setting.theme)}"
+      WHERE user_id = ${escape(userId)};
   `
   try {
     await db.query(sql)
@@ -34,7 +35,7 @@ export async function find(userId: number): Promise<UserSetting | undefined> {
     use_markdown_guide as useMarkdownGuide,
     lang as lang,
     theme as theme
-    FROM blog.setting WHERE user_id = ${userId};
+    FROM blog.setting WHERE user_id = ${escape(userId)};
   `
   try {
     const results = (await db.query(sql)) as UserSetting[]

@@ -1,5 +1,6 @@
 import { StrArray } from '../utils/type'
 import { WhereKey } from '../utils/enums'
+import { db } from '../utils/mysql'
 
 export function throwSqlError(err: Error): void {
   throw { message: `SQL执行失败, ${err}`, code: 500 }
@@ -16,9 +17,9 @@ export function stringToArray(string: StrArray): string[] {
 export function where(key: WhereKey, value: string | number): string {
   switch (key) {
     case WhereKey.USERNAME:
-      return `WHERE username = "${value}"`
+      return `WHERE username = "${db.escape(value)}"`
     case WhereKey.USER_ID:
-      return `WHERE id = ${value}`
+      return `WHERE id = ${db.escape(value)}`
     default:
       throw `${key} is not found`
   }
