@@ -75,18 +75,18 @@ async function _validate(password: string, whereSql: string): Promise<boolean> {
 export async function create(username: string, password: string, profile: Profile): Promise<void> {
   const sql = /*sql*/ `
     INSERT INTO blog.user SET
-      username = "${escape(username)}",
-      password = "${escape(password)}",
-      nickname = "${escape(profile.nickname)}",
-      avatar = "${escape(profile.avatar)}",
-      gender = "${escape(profile.gender)}",
-      self_introduction = "${escape(profile.selfIntroduction)}",
-      github = "${escape(profile.github)}",
-      phone = "${escape(profile.phone)}",
-      email = "${escape(profile.email)}",
-      wechat = "${escape(profile.wechat)}",
-      level = "${escape(profile.level)}",
-      is_online = "${escape(profile.isOnline ? 1 : 0)}";
+      username = ${escape(username)},
+      password = ${escape(password)},
+      nickname = ${escape(profile.nickname)},
+      avatar = ${escape(profile.avatar)},
+      gender = ${escape(profile.gender)},
+      self_introduction = ${escape(profile.selfIntroduction)},
+      github = ${escape(profile.github)},
+      phone = ${escape(profile.phone)},
+      email = ${escape(profile.email)},
+      wechat = ${escape(profile.wechat)},
+      level = ${escape(profile.level)},
+      is_online = ${escape(profile.isOnline ? 1 : 0)};
   `
   try {
     await db.query(sql)
@@ -120,15 +120,15 @@ export function findByName(username: string): FindUserResult {
 export async function setProfile(userId: number, profile: Profile): Promise<void> {
   const sql = /*sql*/ `
     UPDATE blog.user SET
-      nickname = "${escape(profile.nickname)}",
-      avatar = "${escape(profile.avatar)}",
-      gender = "${escape(profile.gender)}",
-      self_introduction = "${escape(profile.selfIntroduction)}",
-      github = "${escape(profile.github)}",
-      email = "${escape(profile.email)}",
-      phone = "${escape(profile.phone)}",
-      wechat = "${escape(profile.wechat)}",
-      level = "${escape(profile.level)}"
+      nickname = ${escape(profile.nickname)},
+      avatar = ${escape(profile.avatar)},
+      gender = ${escape(profile.gender)},
+      self_introduction = ${escape(profile.selfIntroduction)},
+      github = ${escape(profile.github)},
+      email = ${escape(profile.email)},
+      phone = ${escape(profile.phone)},
+      wechat = ${escape(profile.wechat)},
+      level = ${escape(profile.level)}
       WHERE id = ${escape(userId)};
   `
   try {
@@ -148,12 +148,12 @@ export async function search(
     }[]
   | undefined
 > {
-  keywords = escape(keywords)
+  keywords = escape(`%${keywords}%`)
   let limitSql: string = limit ? `LIMIT ${escape(limit)}` : ''
   const sql = /*sql*/ `
     SELECT id, username, nickname, avatar FROM blog.user 
-    WHERE username LIKE '%${keywords}%' 
-    OR nickname LIKE '%${keywords}%'
+    WHERE username LIKE ${keywords} 
+    OR nickname LIKE ${keywords}
     ${limitSql};
   `
   try {

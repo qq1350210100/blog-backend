@@ -17,8 +17,8 @@ export async function update(userId: number, setting: UserSetting): Promise<void
     UPDATE blog.setting SET
       drawer_default_opened = ${escape(setting.drawerDefaultOpened)},
       use_markdown_guide = ${escape(setting.useMarkdownGuide)},
-      lang = "${escape(setting.lang)}",
-      theme = "${escape(setting.theme)}"
+      lang = ${escape(setting.lang)},
+      theme = ${escape(setting.theme)}
       WHERE user_id = ${escape(userId)};
   `
   try {

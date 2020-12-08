@@ -17,7 +17,7 @@ export function stringToArray(string: StrArray): string[] {
 export function where(key: WhereKey, value: string | number): string {
   switch (key) {
     case WhereKey.USERNAME:
-      return `WHERE username = "${db.escape(value)}"`
+      return `WHERE username = ${db.escape(value)}`
     case WhereKey.USER_ID:
       return `WHERE id = ${db.escape(value)}`
     default:

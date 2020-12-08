@@ -98,8 +98,10 @@ export default class Article extends Service {
             return 'creation_time'
           case 'popular':
             return 'views'
+          case 'random':
+            return 'rand()'
           default:
-            break
+            throw new Error(`sort by ${sortBy} not match`)
         }
       }
       const res = await this.dao.article.findAndSort(category, getOrderKey())
@@ -141,7 +143,7 @@ export default class Article extends Service {
 
   public async addLikesMember(userId: number): Promise<void> {
     this.likeList = Array.isArray(this.likeList) ? this.likeList : []
-    const hadExist: boolean = this.likeList.some(item => item === userId) || false
+    const hadExist: boolean = this.likeList.some((item) => item === userId) || false
     if (hadExist) {
       throw { message: '已经点赞过了', code: 200 }
     }
@@ -154,11 +156,11 @@ export default class Article extends Service {
 
   public async removeLikesMember(userId: number): Promise<void> {
     this.likeList = Array.isArray(this.likeList) ? this.likeList : []
-    const hadExist: boolean = this.likeList.some(item => item === userId) || false
+    const hadExist: boolean = this.likeList.some((item) => item === userId) || false
     if (!hadExist) return
 
     if (this.id) {
-      const newLikes = this.likeList.filter(item => item !== userId)
+      const newLikes = this.likeList.filter((item) => item !== userId)
       await this.dao.article.setLikes(this.id, newLikes)
       this.likeList = newLikes
     }
