@@ -5,9 +5,9 @@
   "author": "pb",
   "license": "MIT",
   "scripts": {
-    "server": "tsc && pm2 start ./dist/app.js",
     "dev": "tsnd -P ./tsconfig.json --respawn ./src/app.ts",
-    "build": "rm -rf dist && tsc"
+    "build": "rm -rf dist && tsc",
+    "server": "tsc && pm2 start ./dist/app.js"
   },
   "dependencies": {
     "@koa/cors": "^3.1.0",
@@ -21,7 +21,7 @@
     "koa-swagger-decorator": "^1.7.3",
     "mysql2": "^2.2.5",
     "omit.js": "^2.0.2",
-    "uuid": "^8.3.1"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/koa-session": "^5.10.3",
@@ -31,7 +31,7 @@
     "@types/koa-router": "^7.4.1",
     "@types/koa-static": "^4.0.1",
     "@types/koa__cors": "^3.0.2",
-    "@types/node": "^14.14.10",
+    "@types/node": "^14.14.12",
     "@types/uuid": "^8.3.0",
     "pm": "^2.2.6",
     "ts-node-dev": "^1.0.0",

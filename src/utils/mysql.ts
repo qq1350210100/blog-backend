@@ -1,20 +1,11 @@
 import mysql from 'mysql2'
-
-const config = {
-  host: '8.129.105.196',
-  user: 'root',
-  password: '11568171',
-  database: 'blog',
-  port: 3306,
-  multipleStatements: true, //允许多条sql同时执行
-  insecureAuth: true
-}
+import { localConfig } from '../config'
 
 export class Mysql {
   pool: mysql.Pool
-  escape: (value: any) => string
-  constructor(config: mysql.PoolOptions) {
-    this.pool = mysql.createPool(config)
+  escape: (value: unknown) => string
+  constructor() {
+    this.pool = mysql.createPool(localConfig)
     this.escape = mysql.escape
   }
 
@@ -27,4 +18,4 @@ export class Mysql {
   }
 }
 
-export const db = new Mysql(config)
+export const db = new Mysql()

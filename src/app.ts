@@ -19,12 +19,16 @@ app
     session(
       {
         key: 'koa.sess',
-        maxAge: 864000000
+        maxAge: 8640000000 // 100 days
       },
       app
     )
   )
-  .use(koaStatic(path.join(__dirname, '../static')))
+  .use(
+    koaStatic(path.join(__dirname, '../static'), {
+      gzip: true
+    })
+  )
   .use(bodyParser())
   .use(respHandler())
   .use(router.routes())
