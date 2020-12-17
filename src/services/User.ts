@@ -3,7 +3,6 @@ import Article from './Article'
 import { Profile } from '../utils/type'
 import * as is from '../utils/is'
 import { Setting } from '.'
-import { article } from '../dao'
 
 export default class User extends Service {
   private _userId?: number

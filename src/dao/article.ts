@@ -1,8 +1,8 @@
 import { db } from '../utils/mysql'
 import { throwSqlError, stringToArray } from './util'
-import { ArticleInfo, ArticleDetail, FormatedArticleInfo } from '../utils/type'
+import { ArticleInfo, ArticleDetail, FormatedArticleInfo, Review } from '../utils/type'
 
-const { escape } = db
+const { escape, query } = db
 
 async function _find(whereSql: string): Promise<FormatedArticleInfo[] | undefined> {
   const sql = /*sql*/ `
@@ -17,12 +17,11 @@ async function _find(whereSql: string): Promise<FormatedArticleInfo[] | undefine
       introduce,
       tags,
       likes,
-      collections,
-      comments
+      collections
     FROM blog.article ${whereSql};
   `
   try {
-    const results = (await db.query(sql)) as ArticleInfo[]
+    const results: ArticleInfo[] = await query(sql)
     return results.map((article) => ({
       ...article,
       tags: stringToArray(article.tags),
@@ -37,21 +36,22 @@ export function findAndSort(
   category: string,
   orderKey: 'creation_time' | 'views' | 'rand()'
 ): Promise<FormatedArticleInfo[] | undefined> {
-  let whereSql: string = category === 'all' ? '' : `WHERE category = ${escape(category)}`
+  let whereSql: string = category === 'all' ? '' : /*sql*/ `WHERE category = ${escape(category)}`
   let orderSql: string = orderKey ? `ORDER BY ${orderKey} DESC` : ''
   return _find(`${whereSql} ${orderSql}`)
 }
 
 export function findById(id: number): Promise<FormatedArticleInfo[] | undefined> {
-  return _find(`WHERE id = ${escape(id)}`)
+  return _find(/*sql*/ `WHERE id = ${escape(id)}`)
 }
 
 export async function getContent(articleId: number): Promise<string | undefined> {
   const sql = /*sql*/ `SELECT content FROM blog.article WHERE id = ${escape(articleId)};`
   try {
-    const results = (await db.query(sql)) as { content: string }[]
+    const results: { content: string }[] = await query(sql)
     if (!results.length) return
-    return results[0].content
+    const [{ content }] = results
+    return content
   } catch (err) {
     throwSqlError(err)
   }
@@ -71,7 +71,7 @@ export async function add(detail: ArticleDetail): Promise<void> {
       creation_time = ${escape(detail.creationTime)};
   `
   try {
-    await db.query(sql)
+    await query(sql)
   } catch (err) {
     throwSqlError(err)
   }
@@ -80,7 +80,7 @@ export async function add(detail: ArticleDetail): Promise<void> {
 export async function remove(id: number): Promise<void> {
   const sql = /*sql*/ `DELETE FROM blog.article WHERE id = ${escape(id)};`
   try {
-    await db.query(sql)
+    await query(sql)
   } catch (err) {
     throwSqlError(err)
   }
@@ -91,7 +91,7 @@ export async function increaseViews(articleId: number, newViews: number): Promis
     UPDATE blog.article SET views = ${escape(newViews)} WHERE id = ${escape(articleId)};
   `
   try {
-    await db.query(sql)
+    await query(sql)
   } catch (err) {
     throwSqlError(err)
   }
@@ -103,7 +103,7 @@ export async function setLikes(articleId: number, likes: number[]): Promise<void
     articleId
   )};`
   try {
-    await db.query(sql)
+    await query(sql)
   } catch (err) {
     throwSqlError(err)
   }
@@ -131,7 +131,7 @@ export async function search(
     ${limitSql};
   `
   try {
-    return (await db.query(sql)) as {
+    return (await query(sql)) as {
       id: number
       title: string
       author: number
@@ -140,4 +140,48 @@ export async function search(
   } catch (err) {
     throwSqlError(err)
   }
+}
+
+export async function comment(articleId: number, userId: number, content: string): Promise<void> {
+  const sql = /*sql*/ `
+    INSERT INTO blog.review SET
+      articleId = ${escape(articleId)},
+      speaker = ${escape(userId)},
+      content = ${escape(content)},
+      creation_time = ${escape(new Date().getTime())};
+  `
+  try {
+    await query(sql)
+  } catch (err) {
+    throwSqlError(err)
+  }
+}
+
+async function _findReview(whereSql: string): Promise<Review[] | undefined> {
+  const sql = /*sql*/ `
+    SELECT 
+      id AS reviewId,
+      speaker,
+      articleId,
+      content,
+      creation_time AS creationTime
+    FROM blog.review ${whereSql} ORDER BY creation_time DESC;
+  `
+  try {
+    return (await query(sql)) as Review[]
+  } catch (err) {
+    throwSqlError(err)
+  }
+}
+
+export function getReview(reviewId: number) {
+  return _findReview(/*sql*/ `WHERE id = ${escape(reviewId)}`)
+}
+
+export function getReviewByUser(userId: number) {
+  return _findReview(/*sql*/ `WHERE speaker = ${escape(userId)}`)
+}
+
+export function getReviewByArticle(articleId: number) {
+  return _findReview(/*sql*/ `WHERE articleId = ${escape(articleId)}`)
 }

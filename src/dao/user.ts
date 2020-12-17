@@ -40,10 +40,10 @@ async function _find(whereSql: string): FindUserResult {
     FROM blog.user ${whereSql};
   `
   try {
-    const results = (await db.query(sql)) as Account[] & Profile[]
+    const results: Account[] & Profile[] = await db.query(sql)
     if (!results.length) return
 
-    const { username, password, ...profile } = results[0]
+    const [{ username, password, ...profile }] = results
     const { github, email, phone, wechat } = profile
     return {
       account: {
@@ -52,6 +52,7 @@ async function _find(whereSql: string): FindUserResult {
       },
       profile: {
         ...profile,
+        username,
         contacts: { github, email, phone, wechat }
       }
     }
@@ -63,9 +64,10 @@ async function _find(whereSql: string): FindUserResult {
 async function _validate(password: string, whereSql: string): Promise<boolean> {
   const sql = /*sql*/ `SELECT password FROM blog.user ${whereSql};`
   try {
-    const results = (await db.query(sql)) as { password: string }[]
+    const results: { password: string }[] = await db.query(sql)
     if (!results.length) return false
-    return results[0].password === password
+    const [{ password: existPassword }] = results
+    return existPassword === password
   } catch (err) {
     throwSqlError(err)
   }
@@ -133,7 +135,9 @@ export async function setProfile(userId: number, profile: Profile): Promise<void
   `
   try {
     await db.query(sql)
-  } catch (err) {}
+  } catch (err) {
+    throwSqlError(err)
+  }
 }
 
 export async function search(

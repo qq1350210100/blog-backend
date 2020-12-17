@@ -1,18 +1,20 @@
-import { ArticleInfo, ArticleDetail, ArticleSordBy, FormatedArticleInfo } from '../utils/type'
-import { EventEmitter } from 'events'
+import {
+  ArticleInfo,
+  ArticleDetail,
+  ArticleSordBy,
+  FormatedArticleInfo,
+  Profile,
+  Review
+} from '../utils/type'
 import Service from '../utils/baseClass/Service'
-
-export class Service1 extends EventEmitter {
-  constructor() {
-    super()
-  }
-}
+import User from './User'
 
 export default class Article extends Service {
   private _info?: ArticleInfo
   private _content?: string
   private _id?: number
-  private _likeList?: number[]
+  private _likeList: number[]
+  private _reviewList: Review[]
 
   public get id() {
     return this._id
@@ -35,17 +37,25 @@ export default class Article extends Service {
     this._content = value
   }
 
-  public get likeList() {
+  public get likeList(): number[] {
     return this._likeList
   }
-  public set likeList(value) {
+  public set likeList(value: number[]) {
     this._likeList = value
+  }
+
+  public get reviewList(): Review[] {
+    return this._reviewList
+  }
+  public set reviewList(value: Review[]) {
+    this._reviewList = value
   }
 
   constructor(info?: ArticleInfo) {
     super()
     this._info = info
     this._likeList = []
+    this._reviewList = []
   }
 
   public async add(): Promise<void> {
@@ -63,9 +73,18 @@ export default class Article extends Service {
       throw { message: '找不到该文章', code: 200 }
     }
     this.id = id
-    const info = results[0]
+    const [info] = results
     this.info = info
     this.likeList = info.likes
+    await this.setreviewList()
+  }
+
+  private async setreviewList(): Promise<void> {
+    if (!this.id) return
+    const reviews = await this.dao.article.getReviewByArticle(this.id)
+    if (reviews) {
+      this.reviewList = reviews
+    }
   }
 
   public static async remove(id: number): Promise<void> {
@@ -164,5 +183,27 @@ export default class Article extends Service {
       await this.dao.article.setLikes(this.id, newLikes)
       this.likeList = newLikes
     }
+  }
+
+  public async comment(userId: number, content: string): Promise<void> {
+    if (!this.id) return
+    const user = new User()
+    await user.initById(userId)
+    await this.dao.article.comment(this.id, userId, content)
+    await this.setreviewList()
+  }
+
+  public async getReviews(): Promise<(Omit<Review, 'speaker'> & { speaker: Profile })[]> {
+    if (!this.id) return []
+
+    return await Promise.all(
+      this.reviewList.map(async (review) => {
+        const { speaker } = review
+        const user = new User()
+        await user.initById(speaker)
+        const profile: Profile = user.profile ?? {}
+        return { ...review, speaker: profile }
+      })
+    )
   }
 }

@@ -14,7 +14,7 @@ export default class CommonController extends Controller {
   })
   public async search(): Promise<void> {
     let { keywords, limit } = this.ctx.query
-    keywords = keywords.toString()
+    keywords = String(keywords)
     limit = Number(limit)
 
     const { Article, User } = this.service

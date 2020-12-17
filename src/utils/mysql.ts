@@ -9,9 +9,9 @@ export class Mysql {
     this.escape = mysql.escape
   }
 
-  public query = (sql: string): Promise<unknown> => {
+  public query = (sql: string): Promise<any> => {
     return new Promise((resolve, reject) => {
-      this.pool.query(sql, (error, results: unknown[]) => {
+      this.pool.query(sql, (error, results) => {
         error ? reject(error) : resolve(results)
       })
     })

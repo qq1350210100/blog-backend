@@ -11,6 +11,7 @@ export type Account = {
 
 export type Profile = Partial<{
   userId: number
+  username: string
   nickname: string
   avatar: string
   gender: string
@@ -45,7 +46,6 @@ export interface ArticleInfo {
   likes: StrArray
   backgroundImage: string
   creationTime: number
-  comments: string[]
   collections: string[]
 }
 
@@ -68,3 +68,11 @@ export type UserSetting = {
 }
 
 export type ArticleSordBy = 'latest' | 'popular' | 'random'
+
+export interface Review {
+  reviewId: number
+  speaker: number
+  articleId: number
+  content: string
+  creation_time: number
+}

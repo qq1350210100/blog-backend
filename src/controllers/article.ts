@@ -5,6 +5,7 @@ import { RespMsg } from '../utils/enums'
 import { ArticleDetail, ArticleInfo, ArticleSordBy } from '../utils/type'
 import omit from 'omit.js'
 import { auth } from '../middlewares'
+import { user } from '../dao'
 
 @prefix('/article')
 @tagsAll(['Article'])
@@ -49,7 +50,7 @@ export default class ArticleController extends Controller {
       return
     }
 
-    const detail = results[0]
+    const [detail] = results
     this.ctx.resp({ ...detail, content }, RespMsg.OK, 200)
   }
 
@@ -129,9 +130,7 @@ export default class ArticleController extends Controller {
     articleId = Number(articleId)
     userId = Number(userId)
 
-    const { User, Article } = this.service
-    const user = new User()
-    await user.initById(userId)
+    const { Article } = this.service
     const artilce = new Article()
     await artilce.init(articleId)
     await artilce.addLikesMember(userId)
@@ -150,12 +149,47 @@ export default class ArticleController extends Controller {
     articleId = Number(articleId)
     userId = Number(userId)
 
-    const { User, Article } = this.service
-    const user = new User()
-    await user.initById(userId)
+    const { Article } = this.service
     const artilce = new Article()
     await artilce.init(articleId)
     await artilce.removeLikesMember(userId)
     this.ctx.resp({}, RespMsg.OK, 200)
+  }
+
+  @post('/comment')
+  @summary('comment to article')
+  @middlewares([auth()])
+  @body({
+    userId: { type: Number, required: true, example: 1 },
+    articleId: { type: Number, required: true, example: 1 },
+    content: { type: String, required: true, example: 'string' }
+  })
+  public async comment() {
+    let {
+      articleId,
+      userId,
+      content
+    }: { articleId: number; userId: number; content: string } = this.ctx.request.body
+    const { Article } = this.service
+    const article = new Article()
+    await article.init(articleId)
+    await article.comment(userId, content)
+    const reviews = await article.getReviews()
+    const [userLastestReview] = reviews.filter((review) => review.speaker.userId === userId)
+    this.ctx.resp(userLastestReview, RespMsg.OK, 200)
+  }
+
+  @get('/review_list')
+  @summary('get review list in article')
+  @query({
+    articleId: { type: Number, required: true, example: 1 }
+  })
+  public async getreviewList() {
+    let { articleId }: { articleId: number } = this.ctx.query
+    const { Article } = this.service
+    const article = new Article()
+    await article.init(articleId)
+    const reviews = await article.getReviews()
+    this.ctx.resp(reviews, RespMsg.OK, 200)
   }
 }

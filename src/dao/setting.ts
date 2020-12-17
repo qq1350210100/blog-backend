@@ -38,7 +38,7 @@ export async function find(userId: number): Promise<UserSetting | undefined> {
     FROM blog.setting WHERE user_id = ${escape(userId)};
   `
   try {
-    const results = (await db.query(sql)) as UserSetting[]
+    const results: UserSetting[] = await db.query(sql)
     if (!results.length) return
     return results[0]
   } catch (err) {
