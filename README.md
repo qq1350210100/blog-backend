@@ -10,24 +10,29 @@
 
 当前进度：约 `75%`。
 
+前端源码：[https://github.com/pb0710/blog-frontend](https://github.com/pb0710/blog-frontend)
+后端源码：[https://github.com/pb0710/blog-backend](https://github.com/pb0710/blog-backend)
+
 支持功能：
 
 - 用户注册、登录 ✅
 - 用户个人资料、配置项 编辑、同步 ✅
 - markdown 文章展示、编辑、发布 ✅
-- 用户个人详情页
-- 关于页
+- 用户详情页
+- 关于页 ✅
 - 适配移动端响应式 ✅
 - 国际化 ✅
 - 切换主题 ✅
 - 搜索 ✅
-- 用户阅读、点赞 ✅
-- 用户评论
+- 文档入口 ✅
+- 文章阅读数、点赞 ✅
+- 文章评论 ✅
+- 用户关注订阅
 
 技术栈：
 
 - nodejs
-- koa、koa-router、koa-swagger-decorator、koa-session、koa-static
+- koa、koa-router、koa-swagger-decorator、koa-session、koa-static、koa-aysnc-busboy
 - 100% typescript 编写
 - 连接 mysql
 
