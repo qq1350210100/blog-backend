@@ -1,4 +1,4 @@
-import { formData, middlewaresAll, prefix, query, summary, tagsAll } from 'koa-swagger-decorator'
+import { formData, middlewaresAll, prefix, summary, tagsAll } from 'koa-swagger-decorator'
 import Controller from '../utils/baseClass/Controller'
 import { post } from '../utils/requestMapping'
 import { busboy } from '../middlewares'
@@ -8,6 +8,7 @@ import fs from 'fs'
 import path from 'path'
 import { promisify } from 'util'
 import stream from 'stream'
+import compressing from 'compressing'
 import { File } from '../utils/type'
 
 function getSuffixName(filename: string): string {
@@ -37,6 +38,7 @@ export default class FileController extends Controller {
       const savedPath: string = path.join(process.cwd(), 'static/images', filename)
       try {
         await promisify(stream.pipeline)(file, fs.createWriteStream(savedPath))
+        await compressing.gzip.compressFile(savedPath, `${savedPath}.gz`)
       } catch (error) {
         this.ctx.resp({}, error, 500)
       }

@@ -1,11 +1,11 @@
 import mysql from 'mysql2'
-import { localConfig } from '../config'
+import { localConfig, remoteConfig } from '../config'
 
 export class Mysql {
   pool: mysql.Pool
   escape: (value: unknown) => string
   constructor() {
-    this.pool = mysql.createPool(localConfig)
+    this.pool = mysql.createPool(remoteConfig)
     this.escape = mysql.escape
   }
 
