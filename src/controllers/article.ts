@@ -1,11 +1,10 @@
-import Controller from '../utils/baseClass/Controller'
 import { prefix, summary, query, body, tagsAll, middlewares, params } from 'koa-swagger-decorator'
+import omit from 'omit.js'
+import Controller from '../utils/baseClass/Controller'
 import { get, post } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
 import { ArticleDetail, ArticleInfo, ArticleSordBy } from '../utils/type'
-import omit from 'omit.js'
 import { auth } from '../middlewares'
-import { user } from '../dao'
 
 @prefix('/article')
 @tagsAll(['Article'])
@@ -165,7 +164,7 @@ export default class ArticleController extends Controller {
     content: { type: String, required: true, example: 'string' }
   })
   public async comment() {
-    let {
+    const {
       articleId,
       userId,
       content
@@ -185,7 +184,7 @@ export default class ArticleController extends Controller {
     articleId: { type: Number, required: true, example: 1 }
   })
   public async getreviewList() {
-    let { articleId }: { articleId: number } = this.ctx.query
+    const { articleId }: { articleId: number } = this.ctx.query
     const { Article } = this.service
     const article = new Article()
     await article.init(articleId)

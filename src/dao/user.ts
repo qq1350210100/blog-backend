@@ -2,6 +2,7 @@ import { db } from '../utils/mysql'
 import { throwSqlError, where } from './util'
 import { Account, FormatedProfile, Profile } from '../utils/type'
 import { WhereKey } from '../utils/enums'
+
 const { escape } = db
 
 type FindUserResult = Promise<
@@ -12,17 +13,17 @@ type FindUserResult = Promise<
   | undefined
 >
 
-async function _updateOnline(online: boolean, whereSql: string): Promise<void> {
+async function internalUpdateOnline(online: boolean, whereSql: string): Promise<void> {
   try {
-    const sql = /*sql*/ `UPDATE blog.user SET is_online = ${escape(online)} ${whereSql};`
+    const sql = /* sql */ `UPDATE blog.user SET is_online = ${escape(online)} ${whereSql};`
     await db.query(sql)
   } catch (err) {
     throwSqlError(err)
   }
 }
 
-async function _find(whereSql: string): FindUserResult {
-  const sql = /*sql*/ `
+async function internalFind(whereSql: string): FindUserResult {
+  const sql = /* sql */ `
     SELECT 
       username,
       password,
@@ -61,8 +62,8 @@ async function _find(whereSql: string): FindUserResult {
   }
 }
 
-async function _validate(password: string, whereSql: string): Promise<boolean> {
-  const sql = /*sql*/ `SELECT password FROM blog.user ${whereSql};`
+async function internalValidate(password: string, whereSql: string): Promise<boolean> {
+  const sql = /* sql */ `SELECT password FROM blog.user ${whereSql};`
   try {
     const results: { password: string }[] = await db.query(sql)
     if (!results.length) return false
@@ -75,7 +76,7 @@ async function _validate(password: string, whereSql: string): Promise<boolean> {
 }
 
 export async function create(username: string, password: string, profile: Profile): Promise<void> {
-  const sql = /*sql*/ `
+  const sql = /* sql */ `
     INSERT INTO blog.user SET
       username = ${escape(username)},
       password = ${escape(password)},
@@ -99,28 +100,28 @@ export async function create(username: string, password: string, profile: Profil
 
 export async function signIn(username: string, password: string): Promise<void> {
   const whereSql: string = where(WhereKey.USERNAME, username)
-  const passed: boolean = await _validate(password, whereSql)
+  const passed: boolean = await internalValidate(password, whereSql)
   if (!passed) {
     throw { message: '账号或密码错误', code: 200 }
   }
 
-  await _updateOnline(true, whereSql)
+  await internalUpdateOnline(true, whereSql)
 }
 
 export async function signOut(userId: number): Promise<void> {
-  await _updateOnline(false, where(WhereKey.USER_ID, userId))
+  await internalUpdateOnline(false, where(WhereKey.USER_ID, userId))
 }
 
 export function findById(userId: number): FindUserResult {
-  return _find(where(WhereKey.USER_ID, userId))
+  return internalFind(where(WhereKey.USER_ID, userId))
 }
 
 export function findByName(username: string): FindUserResult {
-  return _find(where(WhereKey.USERNAME, username))
+  return internalFind(where(WhereKey.USERNAME, username))
 }
 
 export async function setProfile(userId: number, profile: Profile): Promise<void> {
-  const sql = /*sql*/ `
+  const sql = /* sql */ `
     UPDATE blog.user SET
       nickname = ${escape(profile.nickname)},
       avatar = ${escape(profile.avatar)},
@@ -154,7 +155,7 @@ export async function search(
 > {
   keywords = escape(`%${keywords}%`)
   let limitSql: string = limit ? `LIMIT ${escape(limit)}` : ''
-  const sql = /*sql*/ `
+  const sql = /* sql */ `
     SELECT id, username, nickname, avatar FROM blog.user 
     WHERE username LIKE ${keywords} 
     OR nickname LIKE ${keywords}

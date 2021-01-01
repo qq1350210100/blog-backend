@@ -14,6 +14,7 @@ export default class User extends Service {
   public get password() {
     return this._password
   }
+
   public set password(value) {
     this._password = value
   }
@@ -21,6 +22,7 @@ export default class User extends Service {
   public get userId() {
     return this._userId
   }
+
   public set userId(value) {
     this._userId = value
   }
@@ -28,6 +30,7 @@ export default class User extends Service {
   public get username() {
     return this._username
   }
+
   public set username(value) {
     this._username = value
   }
@@ -35,6 +38,7 @@ export default class User extends Service {
   public get profile() {
     return this._profile
   }
+
   public set profile(value) {
     this._profile = value
   }
@@ -42,6 +46,7 @@ export default class User extends Service {
   public get aritlceList() {
     return this._aritlceList
   }
+
   public set aritlceList(value) {
     this._aritlceList = value
   }

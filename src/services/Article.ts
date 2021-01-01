@@ -19,6 +19,7 @@ export default class Article extends Service {
   public get id() {
     return this._id
   }
+
   public set id(value) {
     this._id = value
   }
@@ -26,6 +27,7 @@ export default class Article extends Service {
   public get info() {
     return this._info
   }
+
   public set info(value) {
     this._info = value
   }
@@ -33,6 +35,7 @@ export default class Article extends Service {
   public get content() {
     return this._content
   }
+
   public set content(value) {
     this._content = value
   }
@@ -40,6 +43,7 @@ export default class Article extends Service {
   public get likeList(): number[] {
     return this._likeList
   }
+
   public set likeList(value: number[]) {
     this._likeList = value
   }
@@ -47,6 +51,7 @@ export default class Article extends Service {
   public get reviewList(): Review[] {
     return this._reviewList
   }
+
   public set reviewList(value: Review[]) {
     this._reviewList = value
   }

@@ -4,8 +4,8 @@ import { ArticleInfo, ArticleDetail, FormatedArticleInfo, Review } from '../util
 
 const { escape, query } = db
 
-async function _find(whereSql: string): Promise<FormatedArticleInfo[] | undefined> {
-  const sql = /*sql*/ `
+async function internalFind(whereSql: string): Promise<FormatedArticleInfo[] | undefined> {
+  const sql = /* sql */ `
     SELECT
       id,
       category,
@@ -36,17 +36,17 @@ export function findAndSort(
   category: string,
   orderKey: 'creation_time' | 'views' | 'rand()'
 ): Promise<FormatedArticleInfo[] | undefined> {
-  let whereSql: string = category === 'all' ? '' : /*sql*/ `WHERE category = ${escape(category)}`
+  let whereSql: string = category === 'all' ? '' : /* sql */ `WHERE category = ${escape(category)}`
   let orderSql: string = orderKey ? `ORDER BY ${orderKey} DESC` : ''
-  return _find(`${whereSql} ${orderSql}`)
+  return internalFind(`${whereSql} ${orderSql}`)
 }
 
 export function findById(id: number): Promise<FormatedArticleInfo[] | undefined> {
-  return _find(/*sql*/ `WHERE id = ${escape(id)}`)
+  return internalFind(/* sql */ `WHERE id = ${escape(id)}`)
 }
 
 export async function getContent(articleId: number): Promise<string | undefined> {
-  const sql = /*sql*/ `SELECT content FROM blog.article WHERE id = ${escape(articleId)};`
+  const sql = /* sql */ `SELECT content FROM blog.article WHERE id = ${escape(articleId)};`
   try {
     const results: { content: string }[] = await query(sql)
     if (!results.length) return
@@ -59,7 +59,7 @@ export async function getContent(articleId: number): Promise<string | undefined>
 
 export async function add(detail: ArticleDetail): Promise<void> {
   const tagsStr = Array.isArray(detail.tags) ? detail.tags.join(',') : ''
-  const sql = /*sql*/ `
+  const sql = /* sql */ `
     INSERT INTO blog.article SET 
       background_image = ${escape(detail.backgroundImage)},
       title = ${escape(detail.title)},
@@ -78,7 +78,7 @@ export async function add(detail: ArticleDetail): Promise<void> {
 }
 
 export async function remove(id: number): Promise<void> {
-  const sql = /*sql*/ `DELETE FROM blog.article WHERE id = ${escape(id)};`
+  const sql = /* sql */ `DELETE FROM blog.article WHERE id = ${escape(id)};`
   try {
     await query(sql)
   } catch (err) {
@@ -87,7 +87,7 @@ export async function remove(id: number): Promise<void> {
 }
 
 export async function increaseViews(articleId: number, newViews: number): Promise<void> {
-  const sql = /*sql*/ `
+  const sql = /* sql */ `
     UPDATE blog.article SET views = ${escape(newViews)} WHERE id = ${escape(articleId)};
   `
   try {
@@ -99,7 +99,7 @@ export async function increaseViews(articleId: number, newViews: number): Promis
 
 export async function setLikes(articleId: number, likes: number[]): Promise<void> {
   const likesStr: string = likes.join(',')
-  const sql = /*sql*/ `UPDATE blog.article SET likes = ${escape(likesStr)} WHERE id = ${escape(
+  const sql = /* sql */ `UPDATE blog.article SET likes = ${escape(likesStr)} WHERE id = ${escape(
     articleId
   )};`
   try {
@@ -123,7 +123,7 @@ export async function search(
 > {
   keywords = escape(`%${keywords}%`)
   let limitSql: string = limit ? `LIMIT ${limit}` : ''
-  const sql = /*sql*/ `
+  const sql = /* sql */ `
     SELECT id, title, author, category FROM blog.article 
     WHERE title LIKE ${keywords} 
     OR introduce LIKE ${keywords} 
@@ -143,7 +143,7 @@ export async function search(
 }
 
 export async function comment(articleId: number, userId: number, content: string): Promise<void> {
-  const sql = /*sql*/ `
+  const sql = /* sql */ `
     INSERT INTO blog.review SET
       articleId = ${escape(articleId)},
       speaker = ${escape(userId)},
@@ -157,8 +157,8 @@ export async function comment(articleId: number, userId: number, content: string
   }
 }
 
-async function _findReview(whereSql: string): Promise<Review[] | undefined> {
-  const sql = /*sql*/ `
+async function internalFindReview(whereSql: string): Promise<Review[] | undefined> {
+  const sql = /* sql */ `
     SELECT 
       id AS reviewId,
       speaker,
@@ -175,13 +175,13 @@ async function _findReview(whereSql: string): Promise<Review[] | undefined> {
 }
 
 export function getReview(reviewId: number) {
-  return _findReview(/*sql*/ `WHERE id = ${escape(reviewId)}`)
+  return internalFindReview(/* sql */ `WHERE id = ${escape(reviewId)}`)
 }
 
 export function getReviewByUser(userId: number) {
-  return _findReview(/*sql*/ `WHERE speaker = ${escape(userId)}`)
+  return internalFindReview(/* sql */ `WHERE speaker = ${escape(userId)}`)
 }
 
 export function getReviewByArticle(articleId: number) {
-  return _findReview(/*sql*/ `WHERE articleId = ${escape(articleId)}`)
+  return internalFindReview(/* sql */ `WHERE articleId = ${escape(articleId)}`)
 }

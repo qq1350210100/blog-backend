@@ -2,7 +2,7 @@ import Koa from 'koa'
 import { RespMsg } from '../utils/enums'
 import { AnyObj } from '../utils/type'
 
-export function responseHandle(): (ctx: Koa.Context, next: Koa.Next) => Promise<void> {
+export default function responseHandle(): (ctx: Koa.Context, next: Koa.Next) => Promise<void> {
   return async (ctx: Koa.Context, next: Koa.Next) => {
     ctx.resp = (payload: AnyObj = {}, message = RespMsg.OK, statusCode = 200) => {
       ctx.type = 'application/json'

@@ -1,5 +1,5 @@
-export { busboy } from './busboy'
+export { default as busboy } from './busboy'
 
-export { responseHandle as respHandler } from './respHandler'
+export { default as respHandler } from './respHandler'
 
-export { authorization as auth } from './auth'
+export { default as auth } from './auth'

@@ -1,10 +1,11 @@
 import { db } from '../utils/mysql'
 import { throwSqlError } from './util'
 import { UserSetting } from '../utils/type'
+
 const { escape } = db
 
 export async function add(userId: number): Promise<void> {
-  const sql = /*sql*/ `INSERT INTO blog.setting SET user_id = ${escape(userId)};`
+  const sql = /* sql */ `INSERT INTO blog.setting SET user_id = ${escape(userId)};`
   try {
     await db.query(sql)
   } catch (err) {
@@ -13,7 +14,7 @@ export async function add(userId: number): Promise<void> {
 }
 
 export async function update(userId: number, setting: UserSetting): Promise<void> {
-  const sql = /*sql*/ `
+  const sql = /* sql */ `
     UPDATE blog.setting SET
       drawer_default_opened = ${escape(setting.drawerDefaultOpened)},
       use_markdown_guide = ${escape(setting.useMarkdownGuide)},
@@ -29,7 +30,7 @@ export async function update(userId: number, setting: UserSetting): Promise<void
 }
 
 export async function find(userId: number): Promise<UserSetting | undefined> {
-  const sql = /*sql*/ `
+  const sql = /* sql */ `
     SELECT 
     drawer_default_opened as drawerDefaultOpened,
     use_markdown_guide as useMarkdownGuide,

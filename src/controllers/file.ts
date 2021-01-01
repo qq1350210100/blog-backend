@@ -1,14 +1,14 @@
 import { formData, middlewaresAll, prefix, summary, tagsAll } from 'koa-swagger-decorator'
-import Controller from '../utils/baseClass/Controller'
-import { post } from '../utils/requestMapping'
-import { busboy } from '../middlewares'
-import { RespMsg } from '../utils/enums'
 import { v4 as uuid } from 'uuid'
 import fs from 'fs'
 import path from 'path'
 import { promisify } from 'util'
 import stream from 'stream'
 import compressing from 'compressing'
+import { RespMsg } from '../utils/enums'
+import { busboy } from '../middlewares'
+import { post } from '../utils/requestMapping'
+import Controller from '../utils/baseClass/Controller'
 import { File } from '../utils/type'
 
 function getSuffixName(filename: string): string {
@@ -32,9 +32,7 @@ export default class FileController extends Controller {
 
     const pipeFile = async (file: File): Promise<string> => {
       // 文件命名规则: 用户ID_uuid.文件类型
-      const filename: string = `${userId ? userId : 'anonymous'}_${uuid()}.${getSuffixName(
-        file.filename
-      )}`
+      const filename: string = `${userId || 'anonymous'}_${uuid()}.${getSuffixName(file.filename)}`
       const savedPath: string = path.join(process.cwd(), 'static/images', filename)
       try {
         await promisify(stream.pipeline)(file, fs.createWriteStream(savedPath))
@@ -42,7 +40,7 @@ export default class FileController extends Controller {
       } catch (error) {
         this.ctx.resp({}, error, 500)
       }
-      const imgUrl: string = request.origin + '/' + path.join('images', filename)
+      const imgUrl: string = `${request.origin}/${path.join('images', filename)}`
       return imgUrl
     }
 

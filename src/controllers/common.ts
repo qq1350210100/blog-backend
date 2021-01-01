@@ -1,9 +1,9 @@
-import Controller from '../utils/baseClass/Controller'
 import { prefix, summary, query, tagsAll } from 'koa-swagger-decorator'
-import { get } from '../utils/requestMapping'
-import { RespMsg } from '../utils/enums'
 import { readFile } from 'fs/promises'
 import path from 'path'
+import Controller from '../utils/baseClass/Controller'
+import { get } from '../utils/requestMapping'
+import { RespMsg } from '../utils/enums'
 
 @prefix('/common')
 @tagsAll(['Common'])

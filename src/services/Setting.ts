@@ -9,36 +9,46 @@ export default class Setting extends Service {
   public get theme(): string {
     return this._theme
   }
+
   public set theme(value: string) {
     this._theme = value
   }
+
   private _language: string
   public get lang(): string {
     return this._language
   }
+
   public set lang(value: string) {
     this._language = value
   }
+
   private _drawerOpened: boolean
   public get drawerDefaultOpened(): boolean {
     return this._drawerOpened
   }
+
   public set drawerDefaultOpened(value: boolean) {
     this._drawerOpened = value
   }
+
   private _useMarkdownGuide: boolean
   public get useMarkdownGuide(): boolean {
     return this._useMarkdownGuide
   }
+
   public set useMarkdownGuide(value: boolean) {
     this._useMarkdownGuide = value
   }
+
   public get userId(): number {
     return this._userId
   }
+
   public set userId(value: number) {
     this._userId = value
   }
+
   constructor(userId: number) {
     super()
     this._userId = userId

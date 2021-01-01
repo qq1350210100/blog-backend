@@ -1,10 +1,10 @@
-import Controller from '../utils/baseClass/Controller'
 import { prefix, summary, body, tagsAll, query, middlewares } from 'koa-swagger-decorator'
+import { Context } from 'koa'
+import Controller from '../utils/baseClass/Controller'
 import { get, post } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
 import { convertToBoolean } from '../utils'
 import { auth } from '../middlewares'
-import { Context } from 'koa'
 import { Profile } from '../utils/type'
 
 @prefix('/user')
@@ -27,7 +27,6 @@ export default class UserController extends Controller {
         setting: convertToBoolean(userSetting)
       }
       this.ctx.resp(result, RespMsg.OK, 200)
-      return
     }
   }
 
