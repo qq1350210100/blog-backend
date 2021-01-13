@@ -29,7 +29,7 @@ export default class CommonController extends Controller {
 
   @get('/urls')
   @summary('Get some development documents')
-  public async fetchUrls() {
+  public async fetchUrls(): Promise<void> {
     const jsonPath = path.join(process.cwd(), 'static/json/urls.json')
     const json = await readFile(jsonPath, 'utf-8')
     this.ctx.resp(JSON.parse(json), RespMsg.OK, 200)

@@ -67,7 +67,7 @@ export default class Setting extends Service {
     this.useMarkdownGuide = setting.useMarkdownGuide || this.useMarkdownGuide
   }
 
-  public async get(): Promise<UserSetting | undefined> {
+  public async get(): Promise<UserSetting | void> {
     await User.find({ userId: this.userId })
     const userSetting = await this.dao.setting.find(this.userId)
     if (userSetting) {

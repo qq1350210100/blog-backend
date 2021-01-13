@@ -11,9 +11,9 @@ import { Profile } from '../utils/type'
 @tagsAll(['User'])
 export default class UserController extends Controller {
   @get('/init_data')
-  @summary('init user data, include accout,profile and setting')
+  @summary('init user data, includes accout,profile and setting')
   @middlewares([auth()])
-  public async getSignStatus() {
+  public async getSignStatus(): Promise<void> {
     const { userId } = this.ctx as Context & { userId: number }
     const { User, Setting } = this.service
     const userInfo = await User.find({ userId })
@@ -27,6 +27,8 @@ export default class UserController extends Controller {
         setting: convertToBoolean(userSetting)
       }
       this.ctx.resp(result, RespMsg.OK, 200)
+    } else {
+      this.ctx.resp({}, RespMsg.OK, 200)
     }
   }
 
@@ -35,7 +37,7 @@ export default class UserController extends Controller {
   @query({
     username: { type: String, required: true, example: 'string' }
   })
-  public async getProfile() {
+  public async getProfile(): Promise<void> {
     const { username }: { username: string } = this.ctx.query
     const res = await this.service.User.find({ username })
     if (res?.profile) {
