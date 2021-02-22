@@ -174,7 +174,7 @@ export default class ArticleController extends Controller {
     await article.init(articleId)
     await article.comment(userId, content)
     const reviews = await article.getReviews()
-    const [userLastestReview] = reviews.filter((review) => review.speaker.userId === userId)
+    const [userLastestReview] = reviews.filter(review => review.speaker.userId === userId)
     this.ctx.resp(userLastestReview, RespMsg.OK, 200)
   }
 

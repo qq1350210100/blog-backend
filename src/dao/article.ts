@@ -22,7 +22,7 @@ async function internalFind(whereSql: string): Promise<FormatedArticleInfo[] | u
   `
   try {
     const results: ArticleInfo[] = await query(sql)
-    return results.map((article) => ({
+    return results.map(article => ({
       ...article,
       tags: stringToArray(article.tags),
       likes: stringToArray(article.likes).map(Number)
