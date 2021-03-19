@@ -1,6 +1,6 @@
 import { prefix, summary, query, tagsAll } from 'koa-swagger-decorator'
 import { readFile } from 'fs/promises'
-import path from 'path'
+import { join } from 'path'
 import Controller from '../utils/baseClass/Controller'
 import { get } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
@@ -30,7 +30,7 @@ export default class CommonController extends Controller {
   @get('/urls')
   @summary('Get some development documents')
   public async fetchUrls(): Promise<void> {
-    const jsonPath = path.join(process.cwd(), 'static/json/urls.json')
+    const jsonPath = join(process.cwd(), 'static/json/urls.json')
     const json = await readFile(jsonPath, 'utf-8')
     this.ctx.resp(JSON.parse(json), RespMsg.OK, 200)
   }

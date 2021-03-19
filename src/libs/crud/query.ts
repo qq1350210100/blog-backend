@@ -22,9 +22,7 @@ export class Query {
    * 调用此方法表示 SQL 语句拼接结束，随即进行 query 操作。
    * @returns
    */
-  public end() {
-    console.log('end:', `${this.sql};`)
-
+  public end(): Promise<any> {
     return this.db.query(`${this.sql};`)
   }
 

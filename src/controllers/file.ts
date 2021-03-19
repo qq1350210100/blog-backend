@@ -1,20 +1,9 @@
 import { formData, middlewaresAll, prefix, summary, tagsAll } from 'koa-swagger-decorator'
 import { v4 as uuid } from 'uuid'
-import fs from 'fs'
-import path from 'path'
-import { promisify } from 'util'
-import stream from 'stream'
-import compressing from 'compressing'
 import { RespMsg } from '../utils/enums'
 import { busboy } from '../middlewares'
 import { post } from '../utils/requestMapping'
 import Controller from '../utils/baseClass/Controller'
-import { File } from '../utils/type'
-
-function getSuffixName(filename: string): string {
-  const names = filename.split('.')
-  return names[names.length - 1]
-}
 
 @prefix('/file')
 @tagsAll(['File'])
@@ -30,22 +19,16 @@ export default class FileController extends Controller {
     const { fields, files, request } = this.ctx
     const { userId }: { userId: number } = fields
 
-    const pipeFile = async (file: File): Promise<string> => {
-      // 文件命名规则: 用户ID_uuid.文件类型
-      const filename: string = `${userId || 'anonymous'}_${uuid()}.${getSuffixName(file.filename)}`
-      const savedPath: string = path.join(process.cwd(), 'static/images', filename)
-      try {
-        await promisify(stream.pipeline)(file, fs.createWriteStream(savedPath))
-        await compressing.gzip.compressFile(savedPath, `${savedPath}.gz`)
-      } catch (error) {
-        this.ctx.resp({}, error, 500)
-      }
-      const imgUrl: string = `${request.origin}/${path.join('images', filename)}`
-      return imgUrl
+    const io = new this.service.IO()
+    const dirname = request.origin
+    // 文件命名规则: 用户ID_uuid.文件类型
+    const imageName = `${userId || 'anonymous'}_${uuid()}`
+    try {
+      const urls = await io.saveImages(files, dirname, imageName)
+      const result = files.length > 1 ? urls : urls[0]
+      this.ctx.resp(result, RespMsg.OK, 200)
+    } catch (error) {
+      this.ctx.resp({}, error, 500)
     }
-
-    const urls: string[] = await Promise.all(files.map(pipeFile))
-    const result: string | string[] = files.length > 1 ? urls : urls[0]
-    this.ctx.resp(result, RespMsg.OK, 200)
   }
 }
