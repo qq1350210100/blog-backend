@@ -9,8 +9,3 @@ export const enum Method {
   PUT = 'put',
   DELELTE = 'delete'
 }
-
-export const enum WhereKey {
-  USERNAME = 'username',
-  USER_ID = 'userId'
-}

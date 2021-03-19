@@ -81,13 +81,13 @@ export default class Article extends Service {
     const [info] = results
     this.info = info
     this.likeList = info.likes
-    await this.setreviewList()
+    await this.setReviewList()
   }
 
-  private async setreviewList(): Promise<void> {
+  private async setReviewList(): Promise<void> {
     if (!this.id) return
     const reviews = await this.dao.article.getReviewByArticle(this.id)
-    if (reviews) {
+    if (reviews.length) {
       this.reviewList = reviews
     }
   }
@@ -167,7 +167,7 @@ export default class Article extends Service {
 
   public async addLikesMember(userId: number): Promise<void> {
     this.likeList = Array.isArray(this.likeList) ? this.likeList : []
-    const hadExist: boolean = this.likeList.some((item) => item === userId) || false
+    const hadExist: boolean = this.likeList.some(item => item === userId) || false
     if (hadExist) {
       throw { message: '已经点赞过了', code: 200 }
     }
@@ -180,11 +180,11 @@ export default class Article extends Service {
 
   public async removeLikesMember(userId: number): Promise<void> {
     this.likeList = Array.isArray(this.likeList) ? this.likeList : []
-    const hadExist: boolean = this.likeList.some((item) => item === userId) || false
+    const hadExist: boolean = this.likeList.some(item => item === userId) || false
     if (!hadExist) return
 
     if (this.id) {
-      const newLikes = this.likeList.filter((item) => item !== userId)
+      const newLikes = this.likeList.filter(item => item !== userId)
       await this.dao.article.setLikes(this.id, newLikes)
       this.likeList = newLikes
     }
@@ -195,14 +195,14 @@ export default class Article extends Service {
     const user = new User()
     await user.initById(userId)
     await this.dao.article.comment(this.id, userId, content)
-    await this.setreviewList()
+    await this.setReviewList()
   }
 
   public async getReviews(): Promise<(Omit<Review, 'speaker'> & { speaker: Profile })[]> {
     if (!this.id) return []
 
     return await Promise.all(
-      this.reviewList.map(async (review) => {
+      this.reviewList.map(async review => {
         const { speaker } = review
         const user = new User()
         await user.initById(speaker)

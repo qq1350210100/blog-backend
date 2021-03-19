@@ -1,27 +1,43 @@
-import { db } from '../utils/mysql'
+import { query } from '../utils/mysql'
 import { throwSqlError, stringToArray } from './util'
 import { ArticleInfo, ArticleDetail, FormatedArticleInfo, Review } from '../utils/type'
+import { Query } from '../libs/crud/query'
 
-const { escape, query } = db
+function internalFind(): Query {
+  return query()
+    .select(
+      'id',
+      'category',
+      'title',
+      'author',
+      'background_image AS backgroundImage',
+      'views',
+      'creation_time AS creationTime',
+      'introduce',
+      'tags',
+      'likes',
+      'collections'
+    )
+    .from('blog.article')
+}
 
-async function internalFind(whereSql: string): Promise<FormatedArticleInfo[] | undefined> {
-  const sql = /* sql */ `
-    SELECT
-      id,
-      category,
-      title,
-      author,
-      background_image AS backgroundImage,
-      views,
-      creation_time AS creationTime,
-      introduce,
-      tags,
-      likes,
-      collections
-    FROM blog.article ${whereSql};
-  `
+export async function findAndSort(
+  category: string,
+  orderKey: 'creation_time' | 'views' | 'rand()' = 'creation_time'
+): Promise<FormatedArticleInfo[] | undefined> {
   try {
-    const results: ArticleInfo[] = await query(sql)
+    let results: ArticleInfo[] = []
+    if (category === 'all') {
+      results = await internalFind().orderBy(orderKey).desc().end()
+    } else {
+      results = await internalFind()
+        .where()
+        .equal('category', category)
+        .orderBy(orderKey)
+        .desc()
+        .end()
+    }
+
     return results.map(article => ({
       ...article,
       tags: stringToArray(article.tags),
@@ -32,23 +48,27 @@ async function internalFind(whereSql: string): Promise<FormatedArticleInfo[] | u
   }
 }
 
-export function findAndSort(
-  category: string,
-  orderKey: 'creation_time' | 'views' | 'rand()'
-): Promise<FormatedArticleInfo[] | undefined> {
-  let whereSql: string = category === 'all' ? '' : /* sql */ `WHERE category = ${escape(category)}`
-  let orderSql: string = orderKey ? `ORDER BY ${orderKey} DESC` : ''
-  return internalFind(`${whereSql} ${orderSql}`)
-}
-
-export function findById(id: number): Promise<FormatedArticleInfo[] | undefined> {
-  return internalFind(/* sql */ `WHERE id = ${escape(id)}`)
+export async function findById(id: number): Promise<FormatedArticleInfo[] | undefined> {
+  try {
+    const results: ArticleInfo[] = await internalFind().where().equal('id', id).end()
+    return results.map(article => ({
+      ...article,
+      tags: stringToArray(article.tags),
+      likes: stringToArray(article.likes).map(Number)
+    }))
+  } catch (err) {
+    throwSqlError(err)
+  }
 }
 
 export async function getContent(articleId: number): Promise<string | undefined> {
-  const sql = /* sql */ `SELECT content FROM blog.article WHERE id = ${escape(articleId)};`
   try {
-    const results: { content: string }[] = await query(sql)
+    const results: { content: string }[] = await query()
+      .select('content')
+      .from('blog.article')
+      .where()
+      .equal('id', articleId)
+      .end()
     if (!results.length) return
     const [{ content }] = results
     return content
@@ -59,39 +79,35 @@ export async function getContent(articleId: number): Promise<string | undefined>
 
 export async function add(detail: ArticleDetail): Promise<void> {
   const tagsStr = Array.isArray(detail.tags) ? detail.tags.join(',') : ''
-  const sql = /* sql */ `
-    INSERT INTO blog.article SET 
-      background_image = ${escape(detail.backgroundImage)},
-      title = ${escape(detail.title)},
-      introduce = ${escape(detail.introduce)},
-      content = ${escape(detail.content)},
-      author = ${escape(detail.author)},
-      category = ${escape(detail.category)},
-      tags = ${escape(tagsStr)},
-      creation_time = ${escape(detail.creationTime)};
-  `
   try {
-    await query(sql)
+    await query()
+      .insertInto('blog.article')
+      .set({
+        background_image: detail.backgroundImage,
+        title: detail.title,
+        content: detail.content,
+        author: detail.author,
+        category: detail.category,
+        creation_time: detail.creationTime,
+        tags: tagsStr
+      })
+      .end()
   } catch (err) {
     throwSqlError(err)
   }
 }
 
 export async function remove(id: number): Promise<void> {
-  const sql = /* sql */ `DELETE FROM blog.article WHERE id = ${escape(id)};`
   try {
-    await query(sql)
+    await query().delete().from('blog.article').where().equal('id', id).end()
   } catch (err) {
     throwSqlError(err)
   }
 }
 
-export async function increaseViews(articleId: number, newViews: number): Promise<void> {
-  const sql = /* sql */ `
-    UPDATE blog.article SET views = ${escape(newViews)} WHERE id = ${escape(articleId)};
-  `
+export async function increaseViews(articleId: number, views: number): Promise<void> {
   try {
-    await query(sql)
+    await query().update('blog.article').set({ views }).where().equal('id', articleId).end()
   } catch (err) {
     throwSqlError(err)
   }
@@ -99,11 +115,13 @@ export async function increaseViews(articleId: number, newViews: number): Promis
 
 export async function setLikes(articleId: number, likes: number[]): Promise<void> {
   const likesStr: string = likes.join(',')
-  const sql = /* sql */ `UPDATE blog.article SET likes = ${escape(likesStr)} WHERE id = ${escape(
-    articleId
-  )};`
   try {
-    await query(sql)
+    await query()
+      .update('blog.article')
+      .set({ likes: likesStr })
+      .where()
+      .equal('id', articleId)
+      .end()
   } catch (err) {
     throwSqlError(err)
   }
@@ -121,67 +139,59 @@ export async function search(
     }[]
   | undefined
 > {
-  keywords = escape(`%${keywords}%`)
-  let limitSql: string = limit ? `LIMIT ${limit}` : ''
-  const sql = /* sql */ `
-    SELECT id, title, author, category FROM blog.article 
-    WHERE title LIKE ${keywords} 
-    OR introduce LIKE ${keywords} 
-    OR content LIKE ${keywords}
-    ${limitSql};
-  `
   try {
-    return (await query(sql)) as {
-      id: number
-      title: string
-      author: number
-      category: string
-    }[]
+    return await query()
+      .select('id', 'title', 'author', 'category')
+      .from('blog.article')
+      .where()
+      .like('title', `%${keywords}%`)
+      .or()
+      .like('introduce', `%${keywords}%`)
+      .or()
+      .like('content', `%${keywords}%`)
+      .limit(limit)
+      .end()
   } catch (err) {
     throwSqlError(err)
   }
 }
 
 export async function comment(articleId: number, userId: number, content: string): Promise<void> {
-  const sql = /* sql */ `
-    INSERT INTO blog.review SET
-      articleId = ${escape(articleId)},
-      speaker = ${escape(userId)},
-      content = ${escape(content)},
-      creation_time = ${escape(new Date().getTime())};
-  `
   try {
-    await query(sql)
+    await query()
+      .insertInto('blog.review')
+      .set({
+        articleId,
+        speaker: userId,
+        creation_time: new Date().getTime(),
+        content
+      })
+      .end()
   } catch (err) {
     throwSqlError(err)
   }
 }
 
-async function internalFindReview(whereSql: string): Promise<Review[] | undefined> {
-  const sql = /* sql */ `
-    SELECT 
-      id AS reviewId,
-      speaker,
-      articleId,
-      content,
-      creation_time AS creationTime
-    FROM blog.review ${whereSql} ORDER BY creation_time DESC;
-  `
-  try {
-    return (await query(sql)) as Review[]
-  } catch (err) {
-    throwSqlError(err)
-  }
+function internalFindReview(): Query | undefined {
+  return query()
+    .select('id AS reviewId', 'speaker', 'articleId', 'content', 'creation_time AS creationTime')
+    .from('blog.review')
 }
 
-export function getReview(reviewId: number) {
-  return internalFindReview(/* sql */ `WHERE id = ${escape(reviewId)}`)
+export function getReview(reviewId: number): Promise<Review[]> {
+  const reviews = internalFindReview()
+  if (!reviews) return Promise.resolve([])
+  return reviews.where().equal('id', reviewId).orderBy('creation_time').desc().end()
 }
 
-export function getReviewByUser(userId: number) {
-  return internalFindReview(/* sql */ `WHERE speaker = ${escape(userId)}`)
+export function getReviewByUser(userId: number): Promise<Review[]> {
+  const reviews = internalFindReview()
+  if (!reviews) return Promise.resolve([])
+  return reviews.where().equal('speaker', userId).orderBy('creation_time').desc().end()
 }
 
-export function getReviewByArticle(articleId: number) {
-  return internalFindReview(/* sql */ `WHERE articleId = ${escape(articleId)}`)
+export function getReviewByArticle(articleId: number): Promise<Review[]> {
+  const reviews = internalFindReview()
+  if (!reviews) return Promise.resolve([])
+  return reviews.where().equal('articleId', articleId).orderBy('creation_time').desc().end()
 }

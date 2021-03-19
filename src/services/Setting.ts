@@ -77,9 +77,9 @@ export default class Setting extends Service {
     }
   }
 
-  public async add(): Promise<void> {
+  public async create(): Promise<void> {
     await User.find({ userId: this.userId })
-    await this.dao.setting.add(this.userId)
+    await this.dao.setting.create(this.userId)
   }
 
   public async update(setting: UserSetting): Promise<void> {

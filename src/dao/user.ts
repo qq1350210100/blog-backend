@@ -1,9 +1,7 @@
-import { db } from '../utils/mysql'
-import { throwSqlError, where } from './util'
+import { query } from '../utils/mysql'
+import { throwSqlError } from './util'
 import { Account, FormatedProfile, Profile } from '../utils/type'
-import { WhereKey } from '../utils/enums'
-
-const { escape } = db
+import { Query } from '../libs/crud/query'
 
 type FindUserResult = Promise<
   | {
@@ -13,35 +11,94 @@ type FindUserResult = Promise<
   | undefined
 >
 
-async function internalUpdateOnline(online: boolean, whereSql: string): Promise<void> {
+async function internalUpdateOnlineStatus(
+  key: string,
+  value: string | number,
+  online: boolean
+): Promise<void> {
   try {
-    const sql = /* sql */ `UPDATE blog.user SET is_online = ${escape(online)} ${whereSql};`
-    await db.query(sql)
+    await query().update('blog.user').set({ is_online: online }).where().equal(key, value).end()
   } catch (err) {
     throwSqlError(err)
   }
 }
 
-async function internalFind(whereSql: string): FindUserResult {
-  const sql = /* sql */ `
-    SELECT 
-      username,
-      password,
-      id AS userId,
-      nickname,
-      avatar,
-      gender,
-      self_introduction AS selfIntroduction,
-      level,
-      is_online AS isOnline,
-      github,
-      email,
-      phone,
-      wechat
-    FROM blog.user ${whereSql};
-  `
+function internalFind(): Query {
+  return query()
+    .select(
+      'username',
+      'password',
+      'id AS userId',
+      'nickname',
+      'avatar',
+      'gender',
+      'self_introduction AS selfIntroduction',
+      'level',
+      'is_online AS isOnline',
+      'github',
+      'email',
+      'phone',
+      'wechat'
+    )
+    .from('blog.user')
+}
+
+async function internalValidate(username: string, password: string): Promise<boolean> {
   try {
-    const results: Account[] & Profile[] = await db.query(sql)
+    const results: { password: string }[] = await query()
+      .select('password')
+      .from('blog.user')
+      .where()
+      .equal('username', username)
+      .end()
+    if (!results.length) return false
+
+    const [result] = results
+    return result.password === password
+  } catch (err) {
+    throwSqlError(err)
+    return false
+  }
+}
+
+export async function create(username: string, password: string, profile: Profile): Promise<void> {
+  try {
+    await query()
+      .insertInto('blog.user')
+      .set({
+        username,
+        password,
+        nickname: profile.nickname,
+        avatar: profile.avatar,
+        gender: profile.gender,
+        self_introduction: profile.selfIntroduction,
+        github: profile.github,
+        phone: profile.phone,
+        email: profile.email,
+        wechat: profile.wechat,
+        level: profile.level,
+        is_online: profile.isOnline ? 1 : 0
+      })
+      .end()
+  } catch (err) {
+    throwSqlError(err)
+  }
+}
+
+export async function signIn(username: string, password: string): Promise<void> {
+  const passed = await internalValidate(username, password)
+  if (!passed) throw { message: '账号或密码错误', code: 200 }
+
+  internalUpdateOnlineStatus('username', username, true)
+}
+
+export async function signOut(userId: number): Promise<void> {
+  internalUpdateOnlineStatus('userId', userId, false)
+}
+
+async function internalFindBy(key: string, value: string | number): FindUserResult {
+  try {
+    const results: Account[] & Profile[] = await internalFind().where().equal(key, value).end()
     if (!results.length) return
 
     const [{ username, password, ...profile }] = results
@@ -62,80 +119,32 @@ async function internalFind(whereSql: string): FindUserResult {
   }
 }
 
-async function internalValidate(password: string, whereSql: string): Promise<boolean> {
-  const sql = /* sql */ `SELECT password FROM blog.user ${whereSql};`
-  try {
-    const results: { password: string }[] = await db.query(sql)
-    if (!results.length) return false
-    const [{ password: existPassword }] = results
-    return existPassword === password
-  } catch (err) {
-    throwSqlError(err)
-  }
-  return false
-}
-
-export async function create(username: string, password: string, profile: Profile): Promise<void> {
-  const sql = /* sql */ `
-    INSERT INTO blog.user SET
-      username = ${escape(username)},
-      password = ${escape(password)},
-      nickname = ${escape(profile.nickname)},
-      avatar = ${escape(profile.avatar)},
-      gender = ${escape(profile.gender)},
-      self_introduction = ${escape(profile.selfIntroduction)},
-      github = ${escape(profile.github)},
-      phone = ${escape(profile.phone)},
-      email = ${escape(profile.email)},
-      wechat = ${escape(profile.wechat)},
-      level = ${escape(profile.level)},
-      is_online = ${escape(profile.isOnline ? 1 : 0)};
-  `
-  try {
-    await db.query(sql)
-  } catch (err) {
-    throwSqlError(err)
-  }
-}
-
-export async function signIn(username: string, password: string): Promise<void> {
-  const whereSql: string = where(WhereKey.USERNAME, username)
-  const passed: boolean = await internalValidate(password, whereSql)
-  if (!passed) {
-    throw { message: '账号或密码错误', code: 200 }
-  }
-
-  await internalUpdateOnline(true, whereSql)
-}
-
-export async function signOut(userId: number): Promise<void> {
-  await internalUpdateOnline(false, where(WhereKey.USER_ID, userId))
-}
-
 export function findById(userId: number): FindUserResult {
-  return internalFind(where(WhereKey.USER_ID, userId))
+  return internalFindBy('id', userId)
 }
 
 export function findByName(username: string): FindUserResult {
-  return internalFind(where(WhereKey.USERNAME, username))
+  return internalFindBy('username', username)
 }
 
 export async function setProfile(userId: number, profile: Profile): Promise<void> {
-  const sql = /* sql */ `
-    UPDATE blog.user SET
-      nickname = ${escape(profile.nickname)},
-      avatar = ${escape(profile.avatar)},
-      gender = ${escape(profile.gender)},
-      self_introduction = ${escape(profile.selfIntroduction)},
-      github = ${escape(profile.github)},
-      email = ${escape(profile.email)},
-      phone = ${escape(profile.phone)},
-      wechat = ${escape(profile.wechat)},
-      level = ${escape(profile.level)}
-      WHERE id = ${escape(userId)};
-  `
   try {
-    await db.query(sql)
+    await query()
+      .update('blog.user')
+      .set({
+        nickname: profile.nickname,
+        avatar: profile.avatar,
+        gender: profile.gender,
+        self_introduction: profile.selfIntroduction,
+        github: profile.github,
+        email: profile.email,
+        phone: profile.phone,
+        wechat: profile.wechat,
+        level: profile.level
+      })
+      .where()
+      .equal('id', userId)
+      .end()
   } catch (err) {
     throwSqlError(err)
   }
@@ -153,21 +162,16 @@ export async function search(
     }[]
   | undefined
 > {
-  keywords = escape(`%${keywords}%`)
-  let limitSql: string = limit ? `LIMIT ${escape(limit)}` : ''
-  const sql = /* sql */ `
-    SELECT id, username, nickname, avatar FROM blog.user 
-    WHERE username LIKE ${keywords} 
-    OR nickname LIKE ${keywords}
-    ${limitSql};
-  `
   try {
-    return (await db.query(sql)) as {
-      id: number
-      username: string
-      nickname: string
-      avatar: string
-    }[]
+    return await query()
+      .select('id', 'username', 'nickname', 'avatar')
+      .from('blog.user')
+      .where()
+      .like('username', `%${keywords}%`)
+      .or()
+      .like('nickname', `%${keywords}%`)
+      .limit(limit)
+      .end()
   } catch (err) {
     throwSqlError(err)
   }

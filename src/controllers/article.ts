@@ -43,6 +43,9 @@ export default class ArticleController extends Controller {
     const { Article } = this.service
     const results = await Article.find({ id: articleId })
     const content = await Article.getContent(articleId)
+    const article = new Article()
+    await article.init(articleId)
+    const reviews = await article.getReviews()
 
     if (!results || !results.length || !content) {
       this.ctx.resp({}, '未查询到结果', 200)
@@ -50,7 +53,7 @@ export default class ArticleController extends Controller {
     }
 
     const [detail] = results
-    this.ctx.resp({ ...detail, content }, RespMsg.OK, 200)
+    this.ctx.resp({ ...detail, content, reviews }, RespMsg.OK, 200)
   }
 
   @post('/add')
@@ -183,7 +186,7 @@ export default class ArticleController extends Controller {
   @query({
     articleId: { type: Number, required: true, example: 1 }
   })
-  public async getreviewList() {
+  public async getReviewList() {
     const { articleId }: { articleId: number } = this.ctx.query
     const { Article } = this.service
     const article = new Article()

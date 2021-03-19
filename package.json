@@ -10,7 +10,8 @@
     "dev": "tsnd -P ./tsconfig.json --respawn ./src/app.ts",
     "build": "rm -rf dist && tsc",
     "server": "tsc && pm2 start ./dist/app.js",
-    "static": "node ./scripts/handleStaticImages.js"
+    "static": "node ./scripts/handleStaticImages.js",
+    "test:mysql:lib": "tsnd -P ./tsconfig.json --respawn ./src/libs/mysql/index.ts"
   },
   "dependencies": {
     "@koa/cors": "^3.1.0",

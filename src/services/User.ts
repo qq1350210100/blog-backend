@@ -101,7 +101,7 @@ export default class User extends Service {
     if (result?.profile?.userId) {
       const { userId } = result.profile
       const setting = new Setting(userId)
-      await setting.add()
+      await setting.create()
       this.setUserInfo(userId, username, password, profile)
     } else {
       throw { message: '注册失败', code: 200 }
