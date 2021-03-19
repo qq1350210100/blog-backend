@@ -1,7 +1,7 @@
 import { prefix, summary, body, tagsAll, query, middlewares } from 'koa-swagger-decorator'
 import { Context } from 'koa'
 import Controller from '../utils/baseClass/Controller'
-import { get, post } from '../utils/requestMapping'
+import { get, post, put } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
 import { convertToBoolean } from '../utils'
 import { auth } from '../middlewares'
@@ -54,7 +54,7 @@ export default class UserController extends Controller {
     }
   }
 
-  @post('/save_profile')
+  @put('/save_profile')
   @summary('save user profile')
   @body({
     avatar: { type: String, required: false, example: 'string' },

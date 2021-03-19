@@ -8,6 +8,6 @@ export function throwNoResult(): void {
   throw { message: '查询结果为空', code: 200 }
 }
 
-export function stringToArray(string: StrArray): string[] {
-  return string && typeof string === 'string' ? string.split(',') : []
+export function stringToArray(str: StrArray): string[] {
+  return str && typeof str === 'string' ? str.split(',') : []
 }

@@ -1,7 +1,7 @@
 import { prefix, summary, query, body, tagsAll, middlewares, params } from 'koa-swagger-decorator'
 import omit from 'omit.js'
 import Controller from '../utils/baseClass/Controller'
-import { get, post } from '../utils/requestMapping'
+import { get, post, del } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
 import { ArticleDetail, ArticleInfo, ArticleSordBy } from '../utils/type'
 import { auth } from '../middlewares'
@@ -85,7 +85,7 @@ export default class ArticleController extends Controller {
     this.ctx.resp({}, RespMsg.OK, 200)
   }
 
-  @post('/remove')
+  @del('/remove')
   @summary('remove a existing article')
   @middlewares([auth()])
   @body({

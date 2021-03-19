@@ -13,4 +13,4 @@ export const post = (url: string): RequestDecorator => request(Method.POST, url)
 
 export const put = (url: string): RequestDecorator => request(Method.PUT, url)
 
-export const delelte = (url: string): RequestDecorator => request(Method.DELELTE, url)
+export const del = (url: string): RequestDecorator => request(Method.DELETE, url)

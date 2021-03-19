@@ -1,7 +1,7 @@
 import { query } from '../utils/mysql'
 import { throwSqlError, stringToArray } from './util'
 import { ArticleInfo, ArticleDetail, FormatedArticleInfo, Review } from '../utils/type'
-import { Query } from '../libs/crud/query'
+import { Query } from '../libs/crud'
 
 function internalFind(): Query {
   return query()

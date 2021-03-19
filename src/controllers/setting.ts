@@ -1,6 +1,6 @@
-import { body, middlewares, prefix, query, summary, tagsAll } from 'koa-swagger-decorator'
+import { body, middlewares, prefix, summary, tagsAll } from 'koa-swagger-decorator'
 import Controller from '../utils/baseClass/Controller'
-import { get, post } from '../utils/requestMapping'
+import { get, put } from '../utils/requestMapping'
 import { RespMsg } from '../utils/enums'
 import { auth } from '../middlewares'
 
@@ -17,7 +17,7 @@ export default class SettingController extends Controller {
     this.ctx.resp(result, RespMsg.OK, 200)
   }
 
-  @post('/update')
+  @put('/update')
   @summary('upload user setting')
   @body({
     drawerDefaultOpened: { type: Boolean, required: false, example: false },

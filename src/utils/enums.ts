@@ -7,5 +7,5 @@ export const enum Method {
   GET = 'get',
   POST = 'post',
   PUT = 'put',
-  DELELTE = 'delete'
+  DELETE = 'delete'
 }
